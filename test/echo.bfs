@@ -1,0 +1,7 @@
+loop:
+ getc a
+ jeq done, a, 0
+ putc a
+ jmp loop
+done:
+ exit

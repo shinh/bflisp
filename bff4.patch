@@ -1,0 +1,30 @@
+--- bff4.c.orig	2011-09-23 21:20:37.000000000 +0900
++++ bff4.c	2016-02-27 13:03:56.977574237 +0900
+@@ -122,7 +122,8 @@
+ int main()
+ {
+ 	op * o=0, *z, *zend;
+-	int sz=0, i, *m, mp, msz;
++	int sz=0, i, mp, msz;
++    char *m;
+ 	int a = getbf();
+ 	for(;;sz++)
+ 	{
+@@ -161,7 +162,7 @@
+ 
+ 	}
+ 
+-	msz = 1000; /* any number */
++	msz = 10000; /* any number */
+ 	m = zalloci(0,msz,0);
+ 	mp=0;
+ 
+@@ -185,7 +186,7 @@
+ 
+ 		else if( z->c == ',' ){ m[mp] = getchar(); continue; }
+ 
+-		else if( z->c == '.' ){ putchar(m[mp]); continue; }
++		else if( z->c == '.' ){ putchar(m[mp]); fflush(stdout); continue; }
+ 
+ 		/* apply */
+ 		if( z->sz )

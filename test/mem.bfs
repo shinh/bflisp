@@ -1,0 +1,8 @@
+mov b, 77
+store b, 300
+load a, 300
+putc a
+load a, 556
+add a, 10
+putc a
+exit

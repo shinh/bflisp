@@ -81,11 +81,11 @@ assembly code for a virtual 16bit Harvard architecture CPU I
 defined. The CPU has only a handful instructions - mov, add, sub,
 load, store, comparison, conditional jumps, putc, getc, and exit. See
 the top comment in
-(bfasm.rb)[https://github.com/shinh/bflisp/blob/master/bfasm.rb]
-or (test/*.bfs)[https://github.com/shinh/bflisp/tree/master/test]
+[bfasm.rb](https://github.com/shinh/bflisp/blob/master/bfasm.rb)
+or [test/*.bfs](https://github.com/shinh/bflisp/tree/master/test)
 for the detail.
 
-Then, (bfcore.rb)[https://github.com/shinh/bflisp/blob/master/bfcore.rb]
+Then, [bfcore.rb](https://github.com/shinh/bflisp/blob/master/bfcore.rb)
 translates the assembly code to Brainfuck code. The
 CPU has seven 16bit registers and they are consist of two memory cells
 in 8bit Brainfuck (btw, I believe 8bit Brainfuck is the best choice for

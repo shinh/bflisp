@@ -80,9 +80,12 @@ The modified 8cc (a small but full featured C compiler) outputs
 assembly code for a virtual 16bit Harvard architecture CPU I
 defined. The CPU has only a handful instructions - mov, add, sub,
 load, store, comparison, conditional jumps, putc, getc, and exit. See
-the top comment in bfasm.rb or test/*.bfs for the detail.
+the top comment in (bfasm.rb)[https://github.com/shinh/makelisp]
+or (test/*.bfs)[https://github.com/shinh/bflisp/tree/master/test]
+for the detail.
 
-Then, bfcore.rb translates the assembly code to Brainfuck code. The
+Then, (bfcore.rb)[https://github.com/shinh/bflisp/blob/master/bfcore.rb]
+translates the assembly code to Brainfuck code. The
 CPU has seven 16bit registers and they are consist of two memory cells
 in 8bit Brainfuck (btw, I believe 8bit Brainfuck is the best choice for
 this project). For each cycle, a big (~10k-way for bflisp.bf) switch
@@ -150,6 +153,14 @@ TODO
 * Run 8cc on Brainfuck.
 * Implement the virtual CPU with other esoteric language.
 * Fix bugs.
+
+
+See also
+--------
+
+* [Lisp in sed](https://github.com/shinh/sedlisp)
+* [Lisp in Befunge](https://github.com/shinh/beflisp)
+* [Lisp in GNU make](https://github.com/shinh/makelisp)
 
 
 Acknowledgement

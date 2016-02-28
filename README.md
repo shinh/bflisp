@@ -80,7 +80,8 @@ The modified 8cc (a small but full featured C compiler) outputs
 assembly code for a virtual 16bit Harvard architecture CPU I
 defined. The CPU has only a handful instructions - mov, add, sub,
 load, store, comparison, conditional jumps, putc, getc, and exit. See
-the top comment in (bfasm.rb)[https://github.com/shinh/makelisp]
+the top comment in
+(bfasm.rb)[https://github.com/shinh/bflisp/blob/master/bfasm.rb]
 or (test/*.bfs)[https://github.com/shinh/bflisp/tree/master/test]
 for the detail.
 

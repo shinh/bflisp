@@ -66,6 +66,11 @@ class BFSim
     while running
       op, *args, lineno = *code[@pc]
 
+      hp = @mem[256]
+      if @sp != 0 && @sp <= hp
+        STDERR.puts "stack overflow!!! #{@sp} vs #{hp}"
+      end
+
       if $verbose
         STDERR.puts "PC=#@pc A=#@a B=#@b C=#@c D=#@d SP=#@sp BP=#@bp"
         STDERR.print "STK:"

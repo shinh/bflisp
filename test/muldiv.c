@@ -6,6 +6,6 @@ int main() {
   putchar(a * 5);
   int b = 99;
   putchar(b / 3);
-  //int c = 999;
-  //putchar(c % 100);
+  int c = 999;
+  putchar(c % 100);
 }

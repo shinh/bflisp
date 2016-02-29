@@ -8,15 +8,34 @@ int* calloc(int n, int s);
 void free(void* p);
 void exit(int s);
 
-#ifdef __GNUC__
-__attribute__((noinline))
-#endif
+typedef struct {
+  int quot, rem;
+} div_t;
+
+// Our 8cc doesn't support returning a structure value.
+// TODO: update 8cc.
+void my_div(unsigned int a, unsigned int b, div_t* o) {
+  unsigned int q = 0;
+  unsigned int n;
+  while (1) {
+    n = a - b;
+    if (n > a)
+      break;
+    ++q;
+    a = n;
+  }
+  o->quot = q;
+  o->rem = a;
+}
+
 static void print_int(int v) {
   int n = 0;
   int buf[16];
   do {
-    buf[n] = v % 10;
-    v /= 10;
+    div_t d;
+    my_div(v, 10, &d);
+    buf[n] = d.rem;
+    v = d.quot;
     n++;
   } while (v);
 
@@ -62,18 +81,13 @@ static int __builtin_mul(int a, int b) {
 }
 
 static unsigned int __builtin_div(unsigned int a, unsigned int b) {
-  unsigned int r = 0;
-  unsigned int n;
-  while (1) {
-    n = a - b;
-    if (n > a)
-      break;
-    ++r;
-    a = n;
-  }
-  return r;
+  div_t r;
+  my_div(a, b, &r);
+  return r.quot;
 }
 
 static unsigned int __builtin_mod(unsigned int a, unsigned int b) {
-  return a - a / b * b;
+  div_t r;
+  my_div(a, b, &r);
+  return r.rem;
 }

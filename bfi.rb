@@ -88,7 +88,7 @@ class BFInt
         if $verbose
           a = []
           [['PC', NPC], ['A', A], ['B', B], ['C', C], ['D', D],
-           ['SP', SP], ['BP', BP]].each do |n, i|
+           ['BP', BP], ['SP', SP]].each do |n, i|
             v = @mem[i] * 256 + @mem[i+1]
             if i == NPC
               v -= 1

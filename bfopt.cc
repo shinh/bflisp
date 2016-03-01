@@ -12,6 +12,8 @@ typedef unsigned char byte;
 
 using namespace std;
 
+bool g_verbose;
+
 struct Loop;
 
 enum OpType {
@@ -133,6 +135,16 @@ void parse(const char* code, vector<Op*>* ops) {
         }
         loop_stack.pop_back();
         break;
+
+      case '@':
+        if (g_verbose) {
+          op->op = c;
+          break;
+        }
+
+      default:
+        delete op;
+        op = NULL;
     }
 
     if (op)
@@ -158,6 +170,23 @@ void alloc_mem(size_t mp, vector<byte>* mem) {
   if (mp >= mem->size()) {
     mem->resize(mp * 2);
   }
+}
+
+int read_mem(const vector<byte>& mem, int index) {
+  return mem[index] * 256 + mem[index+1];
+}
+
+void dump_state(const vector<byte>& mem) {
+  static const char* kRegs[] = {
+    "PC", "A", "B", "C", "D", "BP", "SP"
+  };
+  for (int i = 0; i < 7; i++) {
+    if (i)
+      printf(" ");
+    printf("%s=%d", kRegs[i], read_mem(mem, 5 + 4 * i));
+  }
+  printf("\n");
+  fflush(stdout);
 }
 
 void run(const vector<Op*>& ops) {
@@ -226,6 +255,11 @@ void run(const vector<Op*>& ops) {
         }
         break;
       }
+
+      case '@':
+        if (g_verbose)
+          dump_state(mem);
+        break;
 
     }
   }
@@ -310,6 +344,8 @@ int main(int argc, char* argv[]) {
   while (argv[1][0] == '-') {
     if (!strcmp(argv[1], "-c")) {
       should_compile = true;
+    } else if (!strcmp(argv[1], "-v")) {
+      g_verbose = true;
     } else {
       fprintf(stderr, "Unknown flag: %s\n", argv[1]);
       return 1;

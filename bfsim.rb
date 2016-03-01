@@ -72,7 +72,7 @@ class BFSim
       end
 
       if $verbose
-        STDERR.puts "PC=#@pc A=#@a B=#@b C=#@c D=#@d SP=#@sp BP=#@bp"
+        STDERR.puts "PC=#@pc A=#@a B=#@b C=#@c D=#@d BP=#@bp SP=#@sp"
         STDERR.print "STK:"
         32.times{|i|
           STDERR.print " #{@mem[-32+i]}"
@@ -103,8 +103,9 @@ class BFSim
 
       when :store
         v = src(args[0])
-        #STDERR.puts "store addr=#{src(args[1])} (#{v}) @#{lineno}"
-        @mem[src(args[1])] = src(args[0])
+        d = src(args[1])
+        #STDERR.puts "store addr=#{d} (#{v}) @#{lineno}"
+        @mem[d] = v
 
       when :jmp, :jeq, :jne, :jlt, :jgt, :jle, :jge
         ok = true

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <algorithm>
 #include <iterator>
@@ -223,15 +224,105 @@ void run(const vector<Op*>& ops) {
             mem[mp + p] += v * d;
           }
         }
+        break;
       }
 
     }
   }
 }
 
+void compile(const vector<Op*>& ops, const char* fname) {
+  FILE* fp = fopen(fname, "wb");
+  fprintf(fp, "#include <stdio.h>\n");
+  fprintf(fp, "unsigned char mem[4096*4096];\n");
+  fprintf(fp, "int main() {\n");
+  fprintf(fp, "int mp = 0;\n");
+
+  for (size_t pc = 0; pc < ops.size(); pc++) {
+    const Op* op = ops[pc];
+    switch (op->op) {
+      case '+':
+        fprintf(fp, "mem[mp]++;\n");
+        break;
+
+      case '-':
+        fprintf(fp, "mem[mp]--;\n");
+        break;
+
+      case OP_MEM:
+        if (op->arg)
+          fprintf(fp, "mem[mp] += %d;\n", op->arg);
+        break;
+
+      case '>':
+        fprintf(fp, "mp++;\n");
+        break;
+
+      case '<':
+        fprintf(fp, "mp--;\n");
+        break;
+
+      case OP_PTR:
+        if (op->arg)
+          fprintf(fp, "mp += %d;\n", op->arg);
+        break;
+
+      case '.':
+        fprintf(fp, "putchar(mem[mp]);\n");
+        break;
+
+      case ',':
+        fprintf(fp, "mem[mp] = getchar();\n");
+        break;
+
+      case '[':
+        fprintf(fp, "while (mem[mp]) {\n");
+        break;
+
+      case ']':
+        fprintf(fp, "}\n");
+        break;
+
+      case OP_LOOP: {
+        fprintf(fp, "if (mem[mp]) {\n");
+        fprintf(fp, "int v = mem[mp];\n");
+        for (map<int, int>::const_iterator iter = op->loop->addsub.begin();
+             iter != op->loop->addsub.end();
+             ++iter) {
+          int p = iter->first;
+          int d = iter->second;
+          if (p != 0) {
+            fprintf(fp, "mem[mp + %d] = v * %d;\n", p, d);
+          }
+        }
+        fprintf(fp, "mem[mp] = 0;\n");
+        fprintf(fp, "}\n");
+        break;
+      }
+
+    }
+  }
+
+  fprintf(fp, "}\n");
+  fclose(fp);
+}
+
 int main(int argc, char* argv[]) {
-  if (argc < 2) {
-    fprintf(stderr, "Usage: %s <bf>\n", argv[0]);
+  bool should_compile = false;
+  const char* arg0 = argv[0];
+  while (argv[1][0] == '-') {
+    if (!strcmp(argv[1], "-c")) {
+      should_compile = true;
+    } else {
+      fprintf(stderr, "Unknown flag: %s\n", argv[1]);
+      return 1;
+    }
+    argc--;
+    argv++;
+  }
+
+  if (argc < 2 || (argc < 3 && should_compile)) {
+    fprintf(stderr, "Usage: %s <bf>\n", arg0);
     return 1;
   }
 
@@ -252,5 +343,8 @@ int main(int argc, char* argv[]) {
 
   vector<Op*> ops;
   parse(buf.c_str(), &ops);
-  run(ops);
+  if (should_compile)
+    compile(ops, argv[2]);
+  else
+    run(ops);
 }

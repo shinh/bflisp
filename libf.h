@@ -5,6 +5,7 @@ typedef unsigned long ptrdiff_t;
 typedef long off_t;
 typedef unsigned char uint8_t;
 typedef int bool;
+typedef long time_t;
 #define true 1
 #define false 0
 #define offsetof(type, field) ((size_t) &((type *)0)->field)
@@ -153,11 +154,15 @@ int puts(const char* p) {
 
 extern int* _edata;
 
-int* calloc(int n, int s) {
+int* malloc(int n) {
   int* r = _edata;
-  // We assume s is the size of int.
   _edata += n;
   return r;
+}
+
+int* calloc(int n, int s) {
+  // We assume s is the size of int.
+  return malloc(n);
 }
 
 void free(void* p) {
@@ -239,6 +244,7 @@ int printf(const char* fmt, ...) {
   va_end(ap);
 }
 
+typedef char FILE;
 void* stdout;
 void* stderr;
 

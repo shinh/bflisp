@@ -122,6 +122,11 @@ class BFAsm
       if in_data
         if line =~ /^\.long (-?\d+)/
           add_data($1.to_i & 65535)
+        elsif line =~ /^\.long (\.?\w+)/
+          if !@labels[$1]
+            raise 'TODO'
+          end
+          add_data(@labels[$1])
         elsif line =~ /^\.lcomm (\w+), (\d+)/
           name = $1
           size = $2.to_i

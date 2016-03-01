@@ -410,7 +410,7 @@ class BFAsm
 
           dest = regpos(args[0])
           g.clear_word(dest)
-          g.move_word(WRK, dest)
+          g.move_word(WRK, dest+1)
 
         when :jmp, :jeq, :jne, :jlt, :jgt, :jle, :jge
           cmpop = op

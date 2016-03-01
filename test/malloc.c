@@ -1,8 +1,8 @@
 #include "../libf.h"
 
 int main() {
-  int* buf = calloc(6, 4);
-  int* buf2 = calloc(6, 4);
+  char* buf = calloc(6, 1);
+  char* buf2 = calloc(6, 1);
   buf[0] = 'h';
   buf[1] = 'e';
   buf[2] = 'l';

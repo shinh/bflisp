@@ -10,4 +10,5 @@ int main() {
   arr[1] = 11;
   arr[2] = 12;
   putchar(bss + val + arr[0] + arr[1] + arr[2] + arr[3]);
+  return 0;
 }

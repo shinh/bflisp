@@ -8,4 +8,5 @@ int main() {
   putchar(arr[0]);
   putchar(arr[1]);
   putchar(arr[2]);
+  return 0;
 }

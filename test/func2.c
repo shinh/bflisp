@@ -28,4 +28,5 @@ int main() {
   putchar(func1(55));
   putchar(func2(33, 34));
   putchar(func3(48, 49, 50));
+  return 0;
 }

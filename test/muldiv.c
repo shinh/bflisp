@@ -8,4 +8,5 @@ int main() {
   putchar(b / 3);
   int c = 999;
   putchar(c % 100);
+  return 0;
 }

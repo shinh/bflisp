@@ -236,22 +236,22 @@ void compile(const vector<Op*>& ops, const char* fname) {
   fprintf(fp, "#include <stdio.h>\n");
   fprintf(fp, "unsigned char mem[4096*4096];\n");
   fprintf(fp, "int main() {\n");
-  fprintf(fp, "int mp = 0;\n");
+  fprintf(fp, "unsigned char* mp = mem;\n");
 
   for (size_t pc = 0; pc < ops.size(); pc++) {
     const Op* op = ops[pc];
     switch (op->op) {
       case '+':
-        fprintf(fp, "mem[mp]++;\n");
+        fprintf(fp, "++*mp;\n");
         break;
 
       case '-':
-        fprintf(fp, "mem[mp]--;\n");
+        fprintf(fp, "--*mp;\n");
         break;
 
       case OP_MEM:
         if (op->arg)
-          fprintf(fp, "mem[mp] += %d;\n", op->arg);
+          fprintf(fp, "*mp += %d;\n", op->arg);
         break;
 
       case '>':
@@ -268,15 +268,15 @@ void compile(const vector<Op*>& ops, const char* fname) {
         break;
 
       case '.':
-        fprintf(fp, "putchar(mem[mp]);\n");
+        fprintf(fp, "putchar(*mp);\n");
         break;
 
       case ',':
-        fprintf(fp, "mem[mp] = getchar();\n");
+        fprintf(fp, "*mp = getchar();\n");
         break;
 
       case '[':
-        fprintf(fp, "while (mem[mp]) {\n");
+        fprintf(fp, "while (*mp) {\n");
         break;
 
       case ']':
@@ -284,19 +284,16 @@ void compile(const vector<Op*>& ops, const char* fname) {
         break;
 
       case OP_LOOP: {
-        fprintf(fp, "if (mem[mp]) {\n");
-        fprintf(fp, "int v = mem[mp];\n");
         for (map<int, int>::const_iterator iter = op->loop->addsub.begin();
              iter != op->loop->addsub.end();
              ++iter) {
           int p = iter->first;
           int d = iter->second;
           if (p != 0) {
-            fprintf(fp, "mem[mp + %d] = v * %d;\n", p, d);
+            fprintf(fp, "mp[%d] += *mp * %d;\n", p, d);
           }
         }
-        fprintf(fp, "mem[mp] = 0;\n");
-        fprintf(fp, "}\n");
+        fprintf(fp, "*mp = 0;\n");
         break;
       }
 

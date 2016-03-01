@@ -338,11 +338,14 @@ class BFAsm
         case op
         when :mov
           dest = regpos(args[0])
-          g.clear_word(dest)
           if sym?(args[1])
             src = regpos(args[1])
-            g.copy_word(src, dest, WRK)
+            if src != dest
+              g.clear_word(dest)
+              g.copy_word(src, dest, WRK)
+            end
           else
+            g.clear_word(dest)
             g.add_word(dest, args[1])
           end
 
@@ -350,6 +353,9 @@ class BFAsm
           dest = regpos(args[0])
           if sym?(args[1])
             src = regpos(args[1])
+            if src == dest
+              raise 'TODO?'
+            end
             g.copy_word(src, WRK, WRK+2)
           else
             g.add_word(WRK, args[1])
@@ -379,6 +385,9 @@ class BFAsm
           dest = regpos(args[0])
           if sym?(args[1])
             src = regpos(args[1])
+            if src == dest
+              raise 'TODO?'
+            end
             g.copy_word(src, WRK, WRK+2)
           else
             g.add_word(WRK, args[1])

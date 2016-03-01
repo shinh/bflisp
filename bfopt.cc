@@ -183,7 +183,10 @@ void dump_state(const vector<byte>& mem) {
   for (int i = 0; i < 7; i++) {
     if (i)
       printf(" ");
-    printf("%s=%d", kRegs[i], read_mem(mem, 5 + 4 * i));
+    int v = read_mem(mem, 5 + 4 * i);
+    if (i == 0)
+      v--;
+    printf("%s=%d", kRegs[i], v);
   }
   printf("\n");
   fflush(stdout);

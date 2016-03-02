@@ -105,7 +105,8 @@ class BFAsm
     code.split("\n").each_with_index do |line, lineno|
       lineno += 1
 
-      line.sub!(/#.*/, '')
+      # TODO: Weird!
+      line.sub!(/(^#| # ).*/, '')
       line.strip!
       next if line.empty?
 

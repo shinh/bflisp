@@ -245,17 +245,18 @@ int printf(const char* fmt, ...) {
 }
 
 typedef char FILE;
-void* stdout;
-void* stderr;
+FILE* stdin;
+FILE* stdout;
+FILE* stderr;
 
-int fprintf(void* fp, const char* fmt, ...) {
+int fprintf(FILE* fp, const char* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
   vprintf(fmt, ap);
   va_end(ap);
 }
 
-int vfprintf(void* fp, const char* fmt, va_list ap) {
+int vfprintf(FILE* fp, const char* fmt, va_list ap) {
   return vprintf(fmt, ap);
 }
 
@@ -282,6 +283,10 @@ int isdigit(int c) {
   return '0' <= c && c <= '9';
 }
 
+int isxdigit(int c) {
+  return isdigit(c) || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F');
+}
+
 int isalpha(int c) {
   return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
@@ -292,6 +297,23 @@ int isalnum(int c) {
 
 char* getenv(const char* name) {
   return NULL;
+}
+
+int atoi(const char* s) {
+  // TODO: Implement?
+  assert(0);
+}
+
+int fileno(FILE* fp) {
+  return 0;
+}
+
+int fclose(FILE* fp) {
+  return 0;
+}
+
+int isatty(int fd) {
+  return 1;
 }
 
 #endif

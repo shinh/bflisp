@@ -134,7 +134,7 @@ class BFAsm
           size.times{
             add_data(0)
           }
-        elsif line =~ /^\.string (".*?")/
+        elsif line =~ /^\.string (".*")/
           str = eval($1)
           str.each_byte{|b|
             add_data(b)

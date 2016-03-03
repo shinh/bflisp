@@ -58,103 +58,107 @@ class BFSim
   end
 
   def run(code, data)
+    if code.size >= 65536
+      STDERR.puts "too much code size: #{code.size}"
+    end
+
     data.each do |d, i|
       @mem[i] = d
     end
 
     running = true
     while running
-      op, *args, lineno = *code[@pc]
-
-      hp = @mem[256]
-      if @sp != 0 && @sp <= hp
-        STDERR.puts "stack overflow!!! #{@sp} vs #{hp}"
-      end
-
-      if $verbose
-        STDERR.puts "PC=#@pc A=#@a B=#@b C=#@c D=#@d BP=#@bp SP=#@sp"
-        STDERR.print "STK:"
-        32.times{|i|
-          STDERR.print " #{@mem[-32+i]}"
-        }
-        STDERR.puts
-        STDERR.puts "#{op} #{args} at #{lineno}"
-      end
-
-      if !op
-        raise "out of bound pc=#{@pc}"
-      end
-      @pc += 1
-
-      case op
-      when :mov
-        set(args[0], src(args[1]))
-
-      when :add
-        set(args[0], (src(args[0]) + src(args[1])) & 65535)
-
-      when :sub
-        set(args[0], (src(args[0]) - src(args[1])) & 65535)
-
-      when :load
-        s = src(args[1])
-        v = @mem[s]
-        if s < 256
-          STDERR.puts "zero-page load: addr=#{s} (#{v}) @#{lineno}"
+      code[@pc].each do |op, *args, lineno|
+        hp = @mem[256]
+        if @sp != 0 && @sp <= hp
+          STDERR.puts "stack overflow!!! #{@sp} vs #{hp}"
         end
-        set(args[0], @mem[src(args[1])])
 
-      when :store
-        v = src(args[0])
-        d = src(args[1])
-        if d < 256
-          STDERR.puts "zero-page store: addr=#{d} (#{v}) @#{lineno}"
+        if $verbose
+          STDERR.puts "PC=#@pc A=#@a B=#@b C=#@c D=#@d BP=#@bp SP=#@sp"
+          STDERR.print "STK:"
+          32.times{|i|
+            STDERR.print " #{@mem[-32+i]}"
+          }
+          STDERR.puts
+          STDERR.puts "#{op} #{args} at #{lineno}"
         end
-        @mem[d] = v
 
-      when :jmp, :jeq, :jne, :jlt, :jgt, :jle, :jge
-        ok = true
+        if !op
+          raise "out of bound pc=#{@pc}"
+        end
+        @pc += 1
+
         case op
-        when :jeq
-          ok = src(args[1]) == src(args[2])
-        when :jne
-          ok = src(args[1]) != src(args[2])
-        when :jlt
-          ok = src(args[1]) < src(args[2])
-        when :jgt
-          ok = src(args[1]) > src(args[2])
-        when :jle
-          ok = src(args[1]) <= src(args[2])
-        when :jge
-          ok = src(args[1]) >= src(args[2])
+        when :mov
+          set(args[0], src(args[1]))
+
+        when :add
+          set(args[0], (src(args[0]) + src(args[1])) & 65535)
+
+        when :sub
+          set(args[0], (src(args[0]) - src(args[1])) & 65535)
+
+        when :load
+          s = src(args[1])
+          v = @mem[s]
+          if s < 256
+            STDERR.puts "zero-page load: addr=#{s} (#{v}) @#{lineno}"
+          end
+          set(args[0], @mem[src(args[1])])
+
+        when :store
+          v = src(args[0])
+          d = src(args[1])
+          if d < 256
+            STDERR.puts "zero-page store: addr=#{d} (#{v}) @#{lineno}"
+          end
+          @mem[d] = v
+
+        when :jmp, :jeq, :jne, :jlt, :jgt, :jle, :jge
+          ok = true
+          case op
+          when :jeq
+            ok = src(args[1]) == src(args[2])
+          when :jne
+            ok = src(args[1]) != src(args[2])
+          when :jlt
+            ok = src(args[1]) < src(args[2])
+          when :jgt
+            ok = src(args[1]) > src(args[2])
+          when :jle
+            ok = src(args[1]) <= src(args[2])
+          when :jge
+            ok = src(args[1]) >= src(args[2])
+          end
+          if ok
+            @pc = src(args[0])
+          end
+
+        when :eq
+          set(args[0], src(args[0]) == src(args[1]) ? 1 : 0)
+        when :ne
+          set(args[0], src(args[0]) != src(args[1]) ? 1 : 0)
+        when :lt
+          set(args[0], src(args[0]) < src(args[1]) ? 1 : 0)
+        when :gt
+          set(args[0], src(args[0]) > src(args[1]) ? 1 : 0)
+        when :le
+          set(args[0], src(args[0]) <= src(args[1]) ? 1 : 0)
+        when :ge
+          set(args[0], src(args[0]) >= src(args[1]) ? 1 : 0)
+
+        when :putc
+          putc src(args[0])
+
+        when :getc
+          c = STDIN.read(1)
+          set(args[0], c ? c.ord : 0)
+
+        when :exit
+          running = false
+          break
         end
-        if ok
-          @pc = src(args[0])
-        end
-
-      when :eq
-        set(args[0], src(args[0]) == src(args[1]) ? 1 : 0)
-      when :ne
-        set(args[0], src(args[0]) != src(args[1]) ? 1 : 0)
-      when :lt
-        set(args[0], src(args[0]) < src(args[1]) ? 1 : 0)
-      when :gt
-        set(args[0], src(args[0]) > src(args[1]) ? 1 : 0)
-      when :le
-        set(args[0], src(args[0]) <= src(args[1]) ? 1 : 0)
-      when :ge
-        set(args[0], src(args[0]) >= src(args[1]) ? 1 : 0)
-
-      when :putc
-        putc src(args[0])
-
-      when :getc
-        c = STDIN.read(1)
-        set(args[0], c ? c.ord : 0)
-
-      when :exit
-        running = false
-        break
       end
     end
 

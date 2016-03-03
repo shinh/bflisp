@@ -98,6 +98,9 @@ class BFAsm
 
   def add_data(v)
     @data << [v, cur_data_addr]
+    if @data.size > 60000
+      raise "Too much data!"
+    end
   end
 
   def parse(code)

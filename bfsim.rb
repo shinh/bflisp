@@ -68,6 +68,7 @@ class BFSim
 
     running = true
     while running
+      npc = nil
       code[@pc].each do |op, *args, lineno|
         hp = @mem[256]
         if @sp != 0 && @sp <= hp
@@ -87,7 +88,7 @@ class BFSim
         if !op
           raise "out of bound pc=#{@pc}"
         end
-        @pc += 1
+        npc = @pc + 1
 
         case op
         when :mov
@@ -132,7 +133,7 @@ class BFSim
             ok = src(args[1]) >= src(args[2])
           end
           if ok
-            @pc = src(args[0])
+            npc = src(args[0])
           end
 
         when :eq
@@ -160,6 +161,8 @@ class BFSim
           break
         end
       end
+
+      @pc = npc
     end
 
   end

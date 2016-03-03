@@ -66,6 +66,7 @@ class BFAsm
 
     @code << [[:jmp, 'main', -1]]
     @labels['main'] = 1
+    @labeled_pcs = { 1 => true }
 
     @labels['_edata'] = cur_data_addr
     add_data(0)
@@ -105,6 +106,7 @@ class BFAsm
 
   def parse(code)
     in_data = false
+    prev_op = nil
     code.split("\n").each_with_index do |line, lineno|
       lineno += 1
 
@@ -127,7 +129,12 @@ class BFAsm
         if @labels[$1] && $1 != 'main'
           raise "multiple label definition (#$1) at line #{lineno}"
         end
-        @labels[$1] = in_data ? cur_data_addr : @code.size
+        if in_data
+          @labels[$1] = cur_data_addr
+        else
+          @labeled_pcs[@code.size] = true
+          @labels[$1] = @code.size
+        end
         next
       end
 
@@ -194,7 +201,13 @@ class BFAsm
         raise "invalid arg for #{op} at line #{lineno}"
       end
 
-      @code << [[op, *args, lineno]]
+      if (@code.size == 1 || @labeled_pcs[@code.size] ||
+          (%i(load store putc getc exit) + @jmp_ops.keys).include?(prev_op))
+        @code << [[op, *args, lineno]]
+      else
+        @code[-1] << [op, *args, lineno]
+      end
+      prev_op = op
     end
 
     @data[0][0] = cur_data_addr
@@ -337,13 +350,14 @@ class BFAsm
         pc = pc_h * 256 + pc_l
         a = @code[pc]
         break if !a
-        a.each do |op, *args, lineno|
-          g.comment("pc=#{pc} op=#{op} #{args*" "}")
 
-          g.add(OP+3, -1)
-          g.move_ptr(OP+1)
-          g.emit '[>]>+[->+'
-          g.set_ptr(OP+3)
+        g.add(OP+3, -1)
+        g.move_ptr(OP+1)
+        g.emit '[>]>+[->+'
+        g.set_ptr(OP+3)
+
+        a.each{|op, *args, lineno|
+          g.comment("pc=#{pc} op=#{op} #{args*" "}")
 
           g.emit '@' if $verbose
           g.dbg("#{op} pc=#{pc}\n", OP+3)
@@ -502,11 +516,11 @@ class BFAsm
 
           end
 
-          g.move_ptr(OP+3)
-          g.emit ']'
-          g.add(OP+1, -1)
+        }
 
-        end
+        g.move_ptr(OP+3)
+        g.emit ']'
+        g.add(OP+1, -1)
 
       end
 

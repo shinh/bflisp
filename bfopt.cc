@@ -337,6 +337,7 @@ void compile(const vector<Op*>& ops, const char* fname) {
     }
   }
 
+  fprintf(fp, "return 0;\n");
   fprintf(fp, "}\n");
   fclose(fp);
 }

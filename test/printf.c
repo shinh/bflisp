@@ -6,7 +6,6 @@ int main() {
   printf("%d\n", n);
   n = sprintf(buf, "%s", "foobar");
   printf("%s %d\n", buf, n);
-  // A compiler issue?
-  //n = snprintf(buf, 3, "foobar");
-  //printf("%s %d\n", buf, n);
+  n = snprintf(buf, 3, "hogefuga");
+  printf("%s %d\n", buf, n);
 }

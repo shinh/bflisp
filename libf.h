@@ -176,7 +176,7 @@ int vsnprintf(char* buf, size_t size, const char* fmt, va_list ap) {
   for (inp = fmt; *inp; inp++) {
     if (*inp != '%') {
       if (!is_overlow) {
-        if (off > size) {
+        if (off + 1 >= size) {
           is_overlow = 1;
           buf[off] = 0;
         } else {
@@ -230,7 +230,7 @@ int vsprintf(char* buf, const char* fmt, va_list ap) {
 int snprintf(char* buf, size_t size, const char* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  int r = vsnprintf(fmt, size, fmt , ap);
+  int r = vsnprintf(buf, size, fmt , ap);
   va_end(ap);
   return r;
 }

@@ -97,14 +97,19 @@ class BFSim
         set(args[0], (src(args[0]) - src(args[1])) & 65535)
 
       when :load
-        v = @mem[src(args[1])]
-        #STDERR.puts "load addr=#{src(args[1])} (#{v}) @#{lineno}"
+        s = src(args[1])
+        v = @mem[s]
+        if s < 256
+          STDERR.puts "zero-page load: addr=#{s} (#{v}) @#{lineno}"
+        end
         set(args[0], @mem[src(args[1])])
 
       when :store
         v = src(args[0])
         d = src(args[1])
-        #STDERR.puts "store addr=#{d} (#{v}) @#{lineno}"
+        if d < 256
+          STDERR.puts "zero-page store: addr=#{d} (#{v}) @#{lineno}"
+        end
         @mem[d] = v
 
       when :jmp, :jeq, :jne, :jlt, :jgt, :jle, :jge

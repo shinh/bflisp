@@ -14,4 +14,7 @@ int main() {
   // TODO: There's an upstream bug in 8cc.
   //S s3 = s1;
   //printf("%d %d %d\n", s3.x, s3.y, s3.z);
+  S* s4 = malloc(sizeof(S));
+  *s4 = s1;
+  printf("%d %d %d\n", s4->x, s4->y, s4->z);
 }

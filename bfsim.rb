@@ -58,6 +58,11 @@ class BFSim
   end
 
   def run(code, data)
+    if !$quiet
+      STDERR.puts "code size: #{code.size}"
+      STDERR.puts "data size: #{data.size}"
+    end
+
     if code.size >= 65536
       STDERR.puts "too much code size: #{code.size}"
     end
@@ -163,6 +168,10 @@ class BFSim
       end
 
       @pc = npc
+    end
+
+    if !$quiet
+      STDERR.puts "last heap: #{@mem[256]}"
     end
 
   end

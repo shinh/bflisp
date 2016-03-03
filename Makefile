@@ -79,7 +79,7 @@ $(BFS_BFS): %.bf: %.bfs $(RUBY_DEPS)
 	./bfcore.rb $< > $@.tmp && mv $@.tmp $@
 
 $(BFS_SIMS): %.sim: %.bfs $(RUBY_DEPS) run.sh
-	./run.sh ./bfsim.rb $< > $@.tmp && mv $@.tmp $@
+	./run.sh ./bfsim.rb -q $< > $@.tmp && mv $@.tmp $@
 
 $(BFS_OUTS): %.out: %.bf run.sh out/bfopt
 	./run.sh out/bfopt $< > $@.tmp && mv $@.tmp $@

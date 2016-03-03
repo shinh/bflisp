@@ -35,7 +35,14 @@ def error(loc, msg)
   exit 1
 end
 
-if ARGV[0] == '-v'
-  $verbose = true
-  ARGV.shift
+while true
+  if ARGV[0] == '-v'
+    $verbose = true
+    ARGV.shift
+  elsif ARGV[0] == '-q'
+    $quiet = true
+    ARGV.shift
+  else
+    break
+  end
 end

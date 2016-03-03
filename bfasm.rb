@@ -116,6 +116,9 @@ class BFAsm
       end
 
       if line =~ /^(\.?\w+):$/
+        if @labels[$1] && $1 != 'main'
+          raise "multiple label definition (#$1) at line #{lineno}"
+        end
         @labels[$1] = in_data ? cur_data_addr : @code.size
         next
       end

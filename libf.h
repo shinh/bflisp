@@ -205,7 +205,8 @@ int vsnprintf(char* buf, size_t size, const char* fmt, va_list ap) {
         cur_p = cur_buf;
         break;
       default:
-        print_str("unknown format!\n");
+        print_int(*inp);
+        print_str(": unknown format!\n");
         exit(1);
     }
 

@@ -115,6 +115,11 @@ class BFAsm
 
       if line =~ /^\.(text|data)/
         in_data = $1 == 'data'
+        if in_data
+          if $' =~ / (-?\d+)/
+            add_data(cur_data_addr + $1.to_i)
+          end
+        end
         next
       end
 

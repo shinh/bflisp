@@ -169,20 +169,21 @@ int* calloc(int n, int s) {
 void free(void* p) {
 }
 
-int vsprintf(char* buf, const char* fmt, va_list ap) {
-  static const char kOverflowMsg[] = " *** OVERFLOW! ***\n";
-  const size_t kMaxFormattedStringSize = sizeof(buf) - sizeof(kOverflowMsg);
-  char* outp = buf;
+int vsnprintf(char* buf, size_t size, const char* fmt, va_list ap) {
   const char* inp;
-  int is_overflow = 0;
-
-  for (inp = fmt; *inp && (outp - buf) < kMaxFormattedStringSize; inp++) {
+  size_t off = 0;
+  int is_overlow = 0;
+  for (inp = fmt; *inp; inp++) {
     if (*inp != '%') {
-      *outp++ = *inp;
-      if (outp - buf >= kMaxFormattedStringSize) {
-        is_overflow = 1;
-        break;
+      if (!is_overlow) {
+        if (off > size) {
+          is_overlow = 1;
+          buf[off] = 0;
+        } else {
+          buf[off] = *inp;
+        }
       }
+      off++;
       continue;
     }
 
@@ -198,56 +199,63 @@ int vsprintf(char* buf, const char* fmt, va_list ap) {
       case 's':
         cur_p = va_arg(ap, char*);
         break;
+      case 'c':
+        cur_buf[0] = va_arg(ap, char);
+        cur_buf[1] = 0;
+        cur_p = cur_buf;
+        break;
       default:
         print_str("unknown format!\n");
         exit(1);
     }
 
     size_t len = strlen(cur_p);
-    if (outp + len - buf >= kMaxFormattedStringSize) {
-      is_overflow = 1;
-      break;
+    if (!is_overlow) {
+      if (off + len >= size) {
+        is_overlow = 1;
+        buf[off] = 0;
+      } else {
+        strcpy(buf + off, cur_p);
+      }
     }
-    strcat(buf, cur_p);
-    outp += len;
+    off += len;
   }
-
-  if (strlen(buf) > kMaxFormattedStringSize) {
-    print_str(buf);
-    if (is_overflow)
-      print_str(kOverflowMsg);
-    // This should not happen.
-    exit(1);
-  }
-  if (is_overflow)
-    strcat(buf, kOverflowMsg);
+  return off;
 }
 
-int vsnprintf(char* buf, size_t size, const char* fmt, va_list ap) {
-  // TODO: Handle size?
-  vsprintf(fmt, ap);
+int vsprintf(char* buf, const char* fmt, va_list ap) {
+  return vsnprintf(buf, 256, fmt, ap);
 }
 
 int snprintf(char* buf, size_t size, const char* fmt, ...) {
-  // TODO: Handle size?
   va_list ap;
   va_start(ap, fmt);
-  vsprintf(fmt, ap);
+  int r = vsnprintf(fmt, size, fmt , ap);
   va_end(ap);
+  return r;
+}
+
+int sprintf(char* buf, const char* fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  int r = vsprintf(buf, fmt, ap);
+  va_end(ap);
+  return r;
 }
 
 int vprintf(const char* fmt, va_list ap) {
-  char buf[300] = {0};
-  vsprintf(buf, fmt, ap);
+  char buf[256] = {0};
+  int r = vsnprintf(buf, 256, fmt, ap);
   print_str(buf);
-  return 0;
+  return r;
 }
 
 int printf(const char* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  vprintf(fmt, ap);
+  int r = vprintf(fmt, ap);
   va_end(ap);
+  return r;
 }
 
 typedef char FILE;

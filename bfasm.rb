@@ -351,21 +351,16 @@ class BFAsm
       end
 
       # Add WRK to dest.
-      g.move_ptr(WRK+1)
-      g.emit '[-'
-      # Put marker.
-      g.add(dest+3, -1)
-      # Increment.
-      g.move_ptr(dest+1)
-      g.emit '+'
-      # Carry?
-      g.emit '[>]>+[-'
-      g.emit '<<+>>>'
-      g.emit '+]'
-      g.set_ptr(dest+3)
-
-      g.move_ptr(WRK+1)
-      g.emit ']'
+      g.loop(WRK+1) {
+        g.emit '-'
+        # Increment.
+        g.move_ptr(dest+1)
+        g.emit '+'
+        # Carry?
+        g.ifzero(1) {
+          g.emit '<<+>>'
+        }
+      }
 
       # Dest wasn't cleared, so this is actually an addition.
       g.move(WRK, dest)
@@ -383,22 +378,17 @@ class BFAsm
       end
 
       # Subtract WRK from dest.
-      g.move_ptr(WRK+1)
-      g.emit '[-'
-      # Put marker.
-      g.add(dest+3, -1)
-      g.move_ptr(dest+1)
-      # Carry?
-      g.emit '[>]>+[-'
-      g.emit '<<->>>'
-      g.emit '+]'
-      g.set_ptr(dest+3)
-      # Decrement.
-      g.move_ptr(dest+1)
-      g.emit '-'
-
-      g.move_ptr(WRK+1)
-      g.emit ']'
+      g.loop(WRK+1) {
+        g.emit '-'
+        g.move_ptr(dest+1)
+        # Carry?
+        g.ifzero(1) {
+          g.emit '<<->>'
+        }
+        # Decrement.
+        g.move_ptr(dest+1)
+        g.emit '-'
+      }
 
       # Dest wasn't cleared, so this is actually a subtraction.
       g.move(WRK, dest, -1)

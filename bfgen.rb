@@ -78,6 +78,14 @@ class BFGen
     emit v > 0 ? '+' * v : '-' * -v
   end
 
+  def loop(ptr, &cb)
+    move_ptr(ptr)
+    emit '['
+    cb[]
+    move_ptr(ptr)
+    emit ']'
+  end
+
   def save_ptr(&cb)
     omp = @mp
     @mp = 0

@@ -323,155 +323,117 @@ class BFAsm
     end
   end
 
-  def emit(g)
-    g.comment 'fetch pc'
-    g.move_word2(PC, NPC, OP)
+  def emit_op(g, op, args, lineno)
+    case op
+    when :mov
+      dest = regpos(args[0])
+      if sym?(args[1])
+        src = regpos(args[1])
+        if src != dest
+          g.clear_word(dest)
+          g.copy_word(src, dest, WRK)
+        end
+      else
+        g.clear_word(dest)
+        g.add_word(dest, args[1])
+      end
 
-    g.comment 'increment pc'
-    g.move_ptr(NPC+3)
-    g.emit '-'
-    g.move_ptr(NPC+1)
-    g.emit '+'
-    g.emit '[>]>+'
-    # if 0
-    g.emit '[-<<+>>>+]'
-    g.set_ptr(NPC+3)
+    when :add
+      dest = regpos(args[0])
+      if sym?(args[1])
+        src = regpos(args[1])
+        if src == dest
+          raise 'TODO?'
+        end
+        g.copy_word(src, WRK, WRK+2)
+      else
+        g.add_word(WRK, args[1])
+      end
 
-    # -1 0 PC_H PC_L 0 -1
-    256.times do |pc_h|
-      g.comment("pc_h=#{pc_h}")
+      # Add WRK to dest.
+      g.move_ptr(WRK+1)
+      g.emit '[-'
+      # Put marker.
+      g.add(dest+3, -1)
+      # Increment.
+      g.move_ptr(dest+1)
+      g.emit '+'
+      # Carry?
+      g.emit '[>]>+[-'
+      g.emit '<<+>>>'
+      g.emit '+]'
+      g.set_ptr(dest+3)
 
-      g.add(OP-2, -1)
-      g.move_ptr(OP)
-      g.emit '[<]<+[-<+'
-      g.set_ptr(OP-2)
+      g.move_ptr(WRK+1)
+      g.emit ']'
 
-      256.times do |pc_l|
-        pc = pc_h * 256 + pc_l
-        a = @code[pc]
-        break if !a
+      # Dest wasn't cleared, so this is actually an addition.
+      g.move(WRK, dest)
 
-        g.add(OP+3, -1)
-        g.move_ptr(OP+1)
-        g.emit '[>]>+[->+'
-        g.set_ptr(OP+3)
+    when :sub
+      dest = regpos(args[0])
+      if sym?(args[1])
+        src = regpos(args[1])
+        if src == dest
+          raise 'TODO?'
+        end
+        g.copy_word(src, WRK, WRK+2)
+      else
+        g.add_word(WRK, args[1])
+      end
 
-        a.each{|op, *args, lineno|
-          g.comment("pc=#{pc} op=#{op} #{args*" "}")
+      # Subtract WRK from dest.
+      g.move_ptr(WRK+1)
+      g.emit '[-'
+      # Put marker.
+      g.add(dest+3, -1)
+      g.move_ptr(dest+1)
+      # Carry?
+      g.emit '[>]>+[-'
+      g.emit '<<->>>'
+      g.emit '+]'
+      g.set_ptr(dest+3)
+      # Decrement.
+      g.move_ptr(dest+1)
+      g.emit '-'
 
-          g.emit '@' if $verbose
-          g.dbg("#{op} pc=#{pc}\n", OP+3)
+      g.move_ptr(WRK+1)
+      g.emit ']'
 
-          case op
-          when :mov
-            dest = regpos(args[0])
-            if sym?(args[1])
-              src = regpos(args[1])
-              if src != dest
-                g.clear_word(dest)
-                g.copy_word(src, dest, WRK)
-              end
-            else
-              g.clear_word(dest)
-              g.add_word(dest, args[1])
-            end
+      # Dest wasn't cleared, so this is actually a subtraction.
+      g.move(WRK, dest, -1)
 
-          when :add
-            dest = regpos(args[0])
-            if sym?(args[1])
-              src = regpos(args[1])
-              if src == dest
-                raise 'TODO?'
-              end
-              g.copy_word(src, WRK, WRK+2)
-            else
-              g.add_word(WRK, args[1])
-            end
+    when :eq, :ne, :lt, :gt, :le, :ge
+      emit_cmp(g, op, args[0], args[1])
 
-            # Add WRK to dest.
-            g.move_ptr(WRK+1)
-            g.emit '[-'
-            # Put marker.
-            g.add(dest+3, -1)
-            # Increment.
-            g.move_ptr(dest+1)
-            g.emit '+'
-            # Carry?
-            g.emit '[>]>+[-'
-            g.emit '<<+>>>'
-            g.emit '+]'
-            g.set_ptr(dest+3)
+      dest = regpos(args[0])
+      g.clear_word(dest)
+      g.move_word(WRK, dest+1)
 
-            g.move_ptr(WRK+1)
-            g.emit ']'
+    when :jmp, :jeq, :jne, :jlt, :jgt, :jle, :jge
+      cmpop = op
+      if cmpop != :jmp
+        cmpop = cmpop.to_s[1,2].to_sym
+      end
+      emit_cmp(g, cmpop, args[1], args[2])
 
-            # Dest wasn't cleared, so this is actually an addition.
-            g.move(WRK, dest)
+      g.move_ptr(WRK)
+      g.emit '[[-]'
+      g.clear_word(NPC)
+      if sym?(args[0])
+        g.copy_word(regpos(args[0]), NPC, WRK)
+      else
+        g.add_word(NPC, args[0])
+      end
+      g.move_ptr(WRK)
+      g.emit ']'
 
-          when :sub
-            dest = regpos(args[0])
-            if sym?(args[1])
-              src = regpos(args[1])
-              if src == dest
-                raise 'TODO?'
-              end
-              g.copy_word(src, WRK, WRK+2)
-            else
-              g.add_word(WRK, args[1])
-            end
-
-            # Subtract WRK from dest.
-            g.move_ptr(WRK+1)
-            g.emit '[-'
-            # Put marker.
-            g.add(dest+3, -1)
-            g.move_ptr(dest+1)
-            # Carry?
-            g.emit '[>]>+[-'
-            g.emit '<<->>>'
-            g.emit '+]'
-            g.set_ptr(dest+3)
-            # Decrement.
-            g.move_ptr(dest+1)
-            g.emit '-'
-
-            g.move_ptr(WRK+1)
-            g.emit ']'
-
-            # Dest wasn't cleared, so this is actually a subtraction.
-            g.move(WRK, dest, -1)
-
-          when :eq, :ne, :lt, :gt, :le, :ge
-            emit_cmp(g, op, args[0], args[1])
-
-            dest = regpos(args[0])
-            g.clear_word(dest)
-            g.move_word(WRK, dest+1)
-
-          when :jmp, :jeq, :jne, :jlt, :jgt, :jle, :jge
-            cmpop = op
-            if cmpop != :jmp
-              cmpop = cmpop.to_s[1,2].to_sym
-            end
-            emit_cmp(g, cmpop, args[1], args[2])
-
-            g.move_ptr(WRK)
-            g.emit '[[-]'
-            g.clear_word(NPC)
-            if sym?(args[0])
-              g.copy_word(regpos(args[0]), NPC, WRK)
-            else
-              g.add_word(NPC, args[0])
-            end
-            g.move_ptr(WRK)
-            g.emit ']'
-
-          when :load
-            g.add(LOAD_REQ, 1)
-            if regpos(args[0]) != A
-              raise 'only "load a, X" is supported'
-            end
-            if sym?(args[1])
+    when :load
+      g.add(LOAD_REQ, 1)
+      if regpos(args[0]) != A
+        raise 'only "load a, X" is supported'
+      end
+      if sym?(args[1])
               g.copy_word(regpos(args[1]), MEM + MEM_A, WRK)
             else
               g.add_word(MEM + MEM_A, args[1])
@@ -511,11 +473,51 @@ class BFAsm
           when :exit
             g.clear(RUNNING)
 
-          when :dump
-            g.emit '@'
+    when :dump
+      g.emit '@'
 
-          end
+    end
+  end
 
+  def emit(g)
+    g.comment 'fetch pc'
+    g.move_word2(PC, NPC, OP)
+
+    g.comment 'increment pc'
+    g.move_ptr(NPC+3)
+    g.emit '-'
+    g.move_ptr(NPC+1)
+    g.emit '+'
+    g.emit '[>]>+'
+    # if 0
+    g.emit '[-<<+>>>+]'
+    g.set_ptr(NPC+3)
+
+    # -1 0 PC_H PC_L 0 -1
+    256.times do |pc_h|
+      g.comment("pc_h=#{pc_h}")
+
+      g.add(OP-2, -1)
+      g.move_ptr(OP)
+      g.emit '[<]<+[-<+'
+      g.set_ptr(OP-2)
+
+      256.times do |pc_l|
+        pc = pc_h * 256 + pc_l
+        a = @code[pc]
+        break if !a
+
+        g.add(OP+3, -1)
+        g.move_ptr(OP+1)
+        g.emit '[>]>+[->+'
+        g.set_ptr(OP+3)
+
+        a.each{|op, *args, lineno|
+          g.comment("pc=#{pc} op=#{op} #{args*" "}")
+          g.emit '@' if $verbose
+          g.dbg("#{op} pc=#{pc}\n", OP+3)
+
+          emit_op(g, op, args, lineno)
         }
 
         g.move_ptr(OP+3)

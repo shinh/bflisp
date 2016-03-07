@@ -1,3 +1,22 @@
+if ENV['BFS24']
+  $bfs24 = true
+end
+
+while true
+  if ARGV[0] == '-v'
+    $verbose = true
+    ARGV.shift
+  elsif ARGV[0] == '-q'
+    $quiet = true
+    ARGV.shift
+  elsif ARGV[0] == '-m'
+    $bfs24 = true
+    ARGV.shift
+  else
+    break
+  end
+end
+
 RUNNING = 0
 PC = 1
 NPC = 5
@@ -33,16 +52,4 @@ def error(loc, msg)
   end
   STDERR.puts("#{r}: #{msg}")
   exit 1
-end
-
-while true
-  if ARGV[0] == '-v'
-    $verbose = true
-    ARGV.shift
-  elsif ARGV[0] == '-q'
-    $quiet = true
-    ARGV.shift
-  else
-    break
-  end
 end

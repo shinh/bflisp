@@ -140,7 +140,7 @@ class BFAsm
 
       if in_data
         if line =~ /^\.long (-?\d+)/
-          add_data($1.to_i & 65535)
+          add_data($1.to_i & UINT_MAX)
         elsif line =~ /^\.long (\.?\w+)/
           if !@labels[$1]
             raise 'TODO'
@@ -227,10 +227,10 @@ class BFAsm
           elsif sym?(a)
             a
           else
-            if a < -32768 || a > 65535
+            if a < INT_MIN || a > UINT_MAX
               raise "number (#{a}) out of bound at line #{i+1}"
             end
-            a & 65535
+            a & UINT_MAX
           end
         end
         [op, *args, lineno]

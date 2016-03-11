@@ -24,21 +24,21 @@ end
 
 RUNNING = 0
 PC = 2
-NPC = 7
-A = 12
-B = 17
-C = 22
-D = 27
-BP = 32
-SP = 37
-OP = 42
+NPC = 8
+A = 14
+B = 20
+C = 26
+D = 32
+BP = 38
+SP = 44
+OP = 50
 
-WRK = 50
+WRK = 60
 
-LOAD_REQ = 54
-STORE_REQ = 55
+LOAD_REQ = 67
+STORE_REQ = 68
 
-MEM = 60
+MEM = 70
 MEM_V = 0
 MEM_A = 2
 MEM_WRK = 4

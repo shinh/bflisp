@@ -173,7 +173,7 @@ void alloc_mem(size_t mp, vector<byte>* mem) {
 }
 
 int read_mem(const vector<byte>& mem, int index) {
-  return mem[index] * 256 + mem[index+1];
+  return mem[index-1] * 65536 + mem[index] * 256 + mem[index+1];
 }
 
 void dump_state(const vector<byte>& mem) {
@@ -183,7 +183,7 @@ void dump_state(const vector<byte>& mem) {
   for (int i = 0; i < 7; i++) {
     if (i)
       printf(" ");
-    int v = read_mem(mem, 5 + 4 * i);
+    int v = read_mem(mem, 7 + 5 * i);
     if (i == 0)
       v--;
     printf("%s=%d", kRegs[i], v);

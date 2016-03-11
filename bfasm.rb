@@ -392,7 +392,7 @@ class BFAsm
         if src == dest
           raise 'TODO?'
         end
-        g.copy_word(src, WRK, WRK+2)
+        g.copy_word(src, WRK, WRK+3)
       else
         g.add_word(WRK, args[1])
       end
@@ -403,15 +403,34 @@ class BFAsm
         g.move_ptr(dest+1)
         # Carry?
         g.ifzero(1) {
-          g.emit '<<->>'
+          if $bfs24
+            g.move_ptr(dest)
+            g.ifzero(2) {
+              g.add(dest-1, -1)
+            }
+          end
+          g.add(dest, -1)
         }
         # Decrement.
-        g.move_ptr(dest+1)
-        g.emit '-'
+        g.add(dest+1, -1)
       }
 
-      # Dest wasn't cleared, so this is actually a subtraction.
-      g.move(WRK, dest, -1)
+      if $bfs24
+        g.loop(WRK) {
+          g.emit '-'
+          g.move_ptr(dest)
+          # Carry?
+          g.ifzero(2) {
+            g.add(dest-1, -1)
+          }
+          # Decrement.
+          g.add(dest, -1)
+        }
+        g.move(WRK-1, dest-1, -1)
+      else
+        # Dest wasn't cleared, so this is actually a subtraction.
+        g.move(WRK, dest, -1)
+      end
 
     when :eq, :ne, :lt, :gt, :le, :ge
       emit_cmp(g, op, args[0], args[1])

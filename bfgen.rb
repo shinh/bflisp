@@ -71,7 +71,7 @@ class BFGen
   end
 
   def add_word(ptr, v)
-    add(ptr, v / 65536) if $bfs24
+    add(ptr-1, v / 65536) if $bfs24
     add(ptr, v / 256 % 256)
     add(ptr+1, v % 256)
   end

@@ -49,12 +49,13 @@ class BFGen
   end
 
   def move_word(from, to, mul=1)
-    #move(from-1, to-1, mul) if $bfs24
+    move(from-1, to-1, mul) if $bfs24
     move(from, to, mul)
     move(from+1, to+1, mul)
   end
 
   def move_word2(from, to, to2)
+    move2(from-1, to-1, to2-1) if $bfs24
     move2(from, to, to2)
     move2(from+1, to+1, to2+1)
   end
@@ -70,7 +71,8 @@ class BFGen
   end
 
   def add_word(ptr, v)
-    add(ptr, v / 256)
+    add(ptr, v / 65536) if $bfs24
+    add(ptr, v / 256 % 256)
     add(ptr+1, v % 256)
   end
 
@@ -126,6 +128,7 @@ class BFGen
   end
 
   def clear_word(ptr)
+    clear(ptr-1) if $bfs24
     clear(ptr)
     clear(ptr+1)
   end

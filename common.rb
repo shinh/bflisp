@@ -1,6 +1,11 @@
 if ENV['BFS24']
   $bfs24 = true
+  BITS = 24
+else
+  BITS = 16
 end
+UINT_MAX = (1 << BITS) - 1
+INT_MIN = -(1 << (BITS - 1))
 
 while true
   if ARGV[0] == '-v'

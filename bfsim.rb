@@ -12,7 +12,7 @@ class BFSim
     @bp = 0
     @sp = 0
     @cond = false
-    @mem = [0] * 65536
+    @mem = [0] * (UINT_MAX+1)
   end
 
   def set(r, v)
@@ -63,7 +63,7 @@ class BFSim
       STDERR.puts "data size: #{data.size}"
     end
 
-    if code.size >= 65536
+    if code.size > UINT_MAX
       STDERR.puts "too much code size: #{code.size}"
     end
 
@@ -100,10 +100,10 @@ class BFSim
           set(args[0], src(args[1]))
 
         when :add
-          set(args[0], (src(args[0]) + src(args[1])) & 65535)
+          set(args[0], (src(args[0]) + src(args[1])) & UINT_MAX)
 
         when :sub
-          set(args[0], (src(args[0]) - src(args[1])) & 65535)
+          set(args[0], (src(args[0]) - src(args[1])) & UINT_MAX)
 
         when :load
           s = src(args[1])

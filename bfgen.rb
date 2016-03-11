@@ -49,6 +49,7 @@ class BFGen
   end
 
   def move_word(from, to, mul=1)
+    #move(from-1, to-1, mul) if $bfs24
     move(from, to, mul)
     move(from+1, to+1, mul)
   end

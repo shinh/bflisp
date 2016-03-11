@@ -23,15 +23,15 @@ while true
 end
 
 RUNNING = 0
-PC = 1
-NPC = 6
-A = 11
-B = 16
-C = 21
-D = 26
-BP = 31
-SP = 36
-OP = 41
+PC = 2
+NPC = 7
+A = 12
+B = 17
+C = 22
+D = 27
+BP = 32
+SP = 37
+OP = 42
 
 WRK = 50
 

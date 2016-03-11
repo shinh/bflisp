@@ -89,7 +89,7 @@ class BFInt
           a = []
           [['PC', NPC], ['A', A], ['B', B], ['C', C], ['D', D],
            ['BP', BP], ['SP', SP]].each do |n, i|
-            v = @mem[i] * 256 + @mem[i+1]
+            v = @mem[i-1] * 65536 + @mem[i] * 256 + @mem[i+1]
             if i == NPC
               v -= 1
             end

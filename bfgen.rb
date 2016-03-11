@@ -89,6 +89,19 @@ class BFGen
     emit ']'
   end
 
+  def not(from, to, wrk)
+    add(to, 1)
+    move(from, wrk)
+    move_ptr(wrk)
+    emit '[-'
+    move_ptr(from)
+    emit '+'
+    move_ptr(to)
+    emit '[-]'
+    move_ptr(wrk)
+    emit ']'
+  end
+
   def save_ptr(&cb)
     omp = @mp
     @mp = 0

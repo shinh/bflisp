@@ -6,12 +6,22 @@ class BFGen
   end
 
   def emit(s)
-    @started = true
-    print s
+    @colno = 0 if @colno == nil
+    while s.length > 0 do
+	if @colno + s.length >= 80
+	    puts s.slice!(0, 80-@colno)
+	    @colno = 0
+	else
+	    print s
+	    @colno = @colno + s.length
+	    return
+	end
+    end
   end
 
   def comment(s)
-    puts if @started
+    puts if @colno && @colno > 0
+    @colno = 0
     puts "# #{s}"
   end
 

@@ -78,6 +78,8 @@ class BFGen
 
   def add(ptr, v)
     move_ptr(ptr)
+    v = v % 256
+    v = v - 256 if v > 127
     emit v > 0 ? '+' * v : '-' * -v
   end
 

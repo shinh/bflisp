@@ -286,36 +286,38 @@ class BFAsm
         end
       else
         # Compare the higher byte first.
-        g.move_ptr(WRK)
-        g.emit '[->>'
-        # If the RHS becomes zero at this moment, LHS >=
-        # RHS. Modify the next byte.
-        g.ifzero(2) do
-          g.emit '<[-]<+<<[-]>>>>'
-        end
-        g.emit '<<<<'
-        g.emit '-<<]'
+        g.loop(WRK){
+          g.emit '-'
+          g.move_ptr(WRK+2)
+          # If the RHS becomes zero at this moment, LHS >=
+          # RHS. Modify the next byte.
+          g.ifzero(2) do
+            g.clear(WRK+3)
+            g.add(WRK+2, 1)
+            g.clear(WRK)
+          end
+          g.add(WRK+2, -1)
+        }
 
         # LH=0. If RH is also zero compare the lower byte.
-        g.emit '>>>>>>-<<<<[[-]>>]>>+'  # 0 LL RH RL 0 0 -1
-        g.emit '[-<<<'
+        g.move_ptr(WRK+2)
+        g.ifzero(2, true) {
+          # Compare the lower byte.
+          g.loop(WRK+1) {
+            g.emit '-'
+            g.move_ptr(WRK+3)
+            g.ifzero(1) do
+              g.add(WRK, 1)
+            end
+            g.add(WRK+3, -1)
+          }
 
-        # Compare the lower byte.
-        g.emit '[->>'
-        g.ifzero(1) do
-          g.emit '<<<<+>>>>'
-        end
-        g.emit '<<'
-        g.emit '-<<]'
-
-        # LL=0. Check RL again.
-        g.emit '>>'
-        g.ifzero(1, true) do
-          g.emit '<<<<+>>>>'
-        end
-        g.emit '>+]'
-
-        g.set_ptr(WRK+6)
+          # LL=0. Check RL again.
+          g.move_ptr(WRK+3)
+          g.ifzero(1, true) do
+            g.add(WRK, 1)
+          end
+        }
 
         g.clear(WRK+1)
         g.clear_word(WRK+2)
@@ -323,8 +325,10 @@ class BFAsm
 
         # Negate the result.
         if op == :lt || op == :gt
-          g.move_ptr(WRK+2)
-          g.emit '-<<[[-]>]>+[-<+>>+]'
+          g.move_ptr(WRK)
+          g.ifzero(1, true) {
+            g.add(WRK+3, 1)
+          }
         end
 
       end

@@ -322,7 +322,7 @@ class BFAsm
         if op == :lt || op == :gt
           g.move_ptr(WRK)
           g.ifzero(1, true) {
-            g.add(WRK+3, 1)
+            g.add(WRK, 1)
           }
         end
 

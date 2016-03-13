@@ -245,36 +245,36 @@ class BFAsm
       g.add(WRK, 1)
     else
       lhspos = WRK
-      rhspos = WRK+2
+      rhspos = WRK+3
       if op == :gt || op == :le
-        lhspos = WRK+2
+        lhspos = WRK+3
         rhspos = WRK
       end
 
-      g.copy_word(regpos(lhs), lhspos, WRK+4)
+      g.copy_word(regpos(lhs), lhspos, WRK+6)
       if sym?(rhs)
-        g.copy_word(regpos(rhs), rhspos, WRK+4)
+        g.copy_word(regpos(rhs), rhspos, WRK+6)
       else
         g.add_word(rhspos, rhs)
       end
 
       if op == :eq || op == :ne
         2.times {|i|
-          g.move(WRK+i, WRK+2+i, -1)
+          g.move(WRK+i, WRK+3+i, -1)
         }
 
         if op == :eq
           g.add(WRK, 1)
           2.times {|i|
-            g.loop(WRK+2+i){
-              g.clear(WRK+2+i)
+            g.loop(WRK+3+i){
+              g.clear(WRK+3+i)
               g.clear(WRK)
             }
           }
         else
           2.times {|i|
-            g.loop(WRK+2+i){
-              g.clear(WRK+2+i)
+            g.loop(WRK+3+i){
+              g.clear(WRK+3+i)
               g.add(WRK, 1)
             }
           }
@@ -283,40 +283,40 @@ class BFAsm
         # Compare the higher byte first.
         g.loop(WRK){
           g.emit '-'
-          g.move_ptr(WRK+2)
+          g.move_ptr(WRK+3)
           # If the RHS becomes zero at this moment, LHS >=
           # RHS. Modify the next byte.
-          g.ifzero(2) do
-            g.clear(WRK+3)
-            g.add(WRK+2, 1)
+          g.ifzero(3) do
+            g.clear(WRK+4)
+            g.add(WRK+3, 1)
             g.clear(WRK)
           end
-          g.add(WRK+2, -1)
+          g.add(WRK+3, -1)
         }
 
         # LH=0. If RH is also zero compare the lower byte.
-        g.move_ptr(WRK+2)
-        g.ifzero(2, true) {
+        g.move_ptr(WRK+3)
+        g.ifzero(3, true) {
           # Compare the lower byte.
           g.loop(WRK+1) {
             g.emit '-'
-            g.move_ptr(WRK+3)
+            g.move_ptr(WRK+4)
             g.ifzero(1) do
               g.add(WRK, 1)
             end
-            g.add(WRK+3, -1)
+            g.add(WRK+4, -1)
           }
 
           # LL=0. Check RL again.
-          g.move_ptr(WRK+3)
+          g.move_ptr(WRK+4)
           g.ifzero(1, true) do
             g.add(WRK, 1)
           end
         }
 
         g.clear(WRK+1)
-        g.clear_word(WRK+2)
-        g.clear_word(WRK+4)
+        g.clear_word(WRK+3)
+        g.clear_word(WRK+6)
 
         # Negate the result.
         if op == :lt || op == :gt

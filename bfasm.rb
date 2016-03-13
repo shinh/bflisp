@@ -259,20 +259,21 @@ class BFAsm
       end
 
       if op == :eq || op == :ne
-        2.times {|i|
+        r = (($bfs24 ? -1 : 0) .. 1)
+        r.each {|i|
           g.move(WRK+i, WRK+3+i, -1)
         }
 
         if op == :eq
           g.add(WRK, 1)
-          2.times {|i|
+          r.each {|i|
             g.loop(WRK+3+i){
               g.clear(WRK+3+i)
               g.clear(WRK)
             }
           }
         else
-          2.times {|i|
+          r.each {|i|
             g.loop(WRK+3+i){
               g.clear(WRK+3+i)
               g.add(WRK, 1)

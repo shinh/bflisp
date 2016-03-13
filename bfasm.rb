@@ -259,22 +259,30 @@ class BFAsm
       end
 
       if op == :eq || op == :ne
-        g.move_ptr(WRK)
-        g.emit '[->>-<<]'
-        g.move_ptr(WRK+1)
-        g.emit '[->>-<<]'
+        g.loop(WRK){
+          g.emit '-'
+          g.add(WRK+2, -1)
+        }
+        g.loop(WRK+1){
+          g.emit '-'
+          g.add(WRK+3, -1)
+        }
 
         if op == :eq
           g.add(WRK, 1)
-          g.move_ptr(WRK+2)
-          g.emit '[[-]<<[-]>>]'
-          g.move_ptr(WRK+3)
-          g.emit '[[-]<<<[-]>>>]'
+          2.times{|i|
+            g.loop(WRK+2+i){
+              g.clear(WRK+2+i)
+              g.clear(WRK)
+            }
+          }
         else
-          g.move_ptr(WRK+2)
-          g.emit '[[-]<<+>>]'
-          g.move_ptr(WRK+3)
-          g.emit '[[-]<<<+>>>]'
+          2.times{|i|
+            g.loop(WRK+2+i){
+              g.clear(WRK+2+i)
+              g.add(WRK, 1)
+            }
+          }
         end
       else
         # Compare the higher byte first.
@@ -429,7 +437,7 @@ class BFAsm
         g.move(WRK-1, dest-1, -1)
       else
         # Dest wasn't cleared, so this is actually a subtraction.
-        g.move(WRK, dest, -1)
+         g.move(WRK, dest, -1)
       end
 
     when :eq, :ne, :lt, :gt, :le, :ge

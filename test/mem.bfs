@@ -2,6 +2,12 @@ mov b, 77
 store b, 300
 load a, 300
 putc a
+mov b, 69
+store b, 30
+load a, 30
+putc a
+add a, 8
+putc a
 load a, 556
 add a, 10
 putc a

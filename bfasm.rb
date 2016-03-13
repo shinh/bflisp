@@ -259,25 +259,20 @@ class BFAsm
       end
 
       if op == :eq || op == :ne
-        g.loop(WRK){
-          g.emit '-'
-          g.add(WRK+2, -1)
-        }
-        g.loop(WRK+1){
-          g.emit '-'
-          g.add(WRK+3, -1)
+        2.times {|i|
+          g.move(WRK+i, WRK+2+i, -1)
         }
 
         if op == :eq
           g.add(WRK, 1)
-          2.times{|i|
+          2.times {|i|
             g.loop(WRK+2+i){
               g.clear(WRK+2+i)
               g.clear(WRK)
             }
           }
         else
-          2.times{|i|
+          2.times {|i|
             g.loop(WRK+2+i){
               g.clear(WRK+2+i)
               g.add(WRK, 1)

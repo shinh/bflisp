@@ -41,6 +41,15 @@ class BFCore
       g.move_ptr(MEM)
       g.set_ptr(0)
 
+      if $bfs24
+        g.decloop(MEM_A-1) {
+          g.move_word(MEM_A, MEM_A + MEM_BLK_LEN*256)
+          g.move_ptr(MEM_A + MEM_BLK_LEN*256)
+          g.set_ptr(MEM_A)
+          g.add(MEM_USE+1, 1)
+        }
+      end
+
       g.decloop(MEM_A) {
         g.move_word(MEM_A, MEM_A + MEM_BLK_LEN)
         g.move_ptr(MEM_A + MEM_BLK_LEN)
@@ -56,11 +65,20 @@ class BFCore
         g.add(MEM_A + 1, -1)
       }
       g.clear(MEM_A + 1)
+
       g.decloop(MEM_USE) {
         g.move_word(MEM_V, MEM_V - MEM_BLK_LEN)
         g.move_ptr(MEM_V - MEM_BLK_LEN)
         g.set_ptr(MEM_V)
       }
+
+      if $bfs24
+        g.decloop(MEM_USE+1) {
+          g.move_word(MEM_V, MEM_V - MEM_BLK_LEN*256)
+          g.move_ptr(MEM_V - MEM_BLK_LEN*256)
+          g.set_ptr(MEM_V)
+        }
+      end
 
       g.move_ptr(0)
       g.set_ptr(MEM)
@@ -76,6 +94,16 @@ class BFCore
     g.decloop(STORE_REQ) {
       g.move_ptr(MEM)
       g.set_ptr(0)
+
+      if $bfs24
+        g.decloop(MEM_A-1) {
+          g.move_word(MEM_V, MEM_V + MEM_BLK_LEN*256)
+          g.move_word(MEM_A, MEM_A + MEM_BLK_LEN*256)
+          g.move_ptr(MEM_A + MEM_BLK_LEN*256)
+          g.set_ptr(MEM_A)
+          g.add(MEM_USE+1, 1)
+        }
+      end
 
       g.decloop(MEM_A) {
         g.move_word(MEM_V, MEM_V + MEM_BLK_LEN)
@@ -95,8 +123,14 @@ class BFCore
         g.add(MEM_A + 1, -1)
       }
       g.clear(MEM_A + 1)
+
       g.move_ptr(MEM_USE)
       g.emit '[-' + '<' * MEM_BLK_LEN + ']'
+
+      if $bfs24
+        g.move_ptr(MEM_USE+1)
+        g.emit '[-' + '<' * (MEM_BLK_LEN*256) + ']'
+      end
 
       g.move_ptr(0)
       g.set_ptr(MEM)

@@ -44,7 +44,7 @@ if $bfs24
   MEM_A = 3
   MEM_WRK = 6
   MEM_USE = 12
-  MEM_CTL_LEN = 13
+  MEM_CTL_LEN = 15
   MEM_BLK_LEN = (256*3) + MEM_CTL_LEN
 else
   MEM_A = 2

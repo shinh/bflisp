@@ -281,6 +281,21 @@ class BFAsm
           }
         end
       else
+        if $bfs24
+          g.loop(WRK-1){
+            g.emit '-'
+            g.move_ptr(WRK+2)
+            # If the RHS becomes zero at this moment, LHS >=
+            # RHS. Modify the next byte.
+            g.ifzero(3) do
+              g.clear(WRK+3)
+              g.add(WRK+2, 1)
+              g.clear(WRK-1)
+            end
+            g.add(WRK+2, -1)
+          }
+        end
+
         # Compare the higher byte first.
         g.loop(WRK){
           g.emit '-'

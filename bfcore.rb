@@ -45,10 +45,9 @@ class BFCore
         g.move_word(MEM_A, MEM_A + MEM_BLK_LEN)
         g.move_ptr(MEM_A + MEM_BLK_LEN)
         g.set_ptr(MEM_A)
-        g.add(MEM_WRK, 1)
+        g.add(MEM_USE, 1)
       }
 
-      g.add(MEM_WRK, -1)
       256.times{|al|
         g.move_ptr(MEM_A + 1)
         g.ifzero(1) do
@@ -57,8 +56,7 @@ class BFCore
         g.add(MEM_A + 1, -1)
       }
       g.clear(MEM_A + 1)
-      g.add(MEM_WRK, 1)
-      g.decloop(MEM_WRK) {
+      g.decloop(MEM_USE) {
         g.move_word(MEM_V, MEM_V - MEM_BLK_LEN)
         g.move_ptr(MEM_V - MEM_BLK_LEN)
         g.set_ptr(MEM_V)
@@ -84,11 +82,10 @@ class BFCore
         g.move_word(MEM_A, MEM_A + MEM_BLK_LEN)
         g.move_ptr(MEM_A + MEM_BLK_LEN)
         g.set_ptr(MEM_A)
-        g.add(MEM_WRK, 1)
+        g.add(MEM_USE, 1)
       }
 
       # VH VL 0 AL 1
-      g.add(MEM_WRK, -1)
       256.times{|al|
         g.move_ptr(MEM_A + 1)
         g.ifzero(1) do
@@ -98,8 +95,7 @@ class BFCore
         g.add(MEM_A + 1, -1)
       }
       g.clear(MEM_A + 1)
-      g.add(MEM_WRK, 1)
-      g.move_ptr(MEM_WRK)
+      g.move_ptr(MEM_USE)
       g.emit '[-' + '<' * MEM_BLK_LEN + ']'
 
       g.move_ptr(0)

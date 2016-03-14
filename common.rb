@@ -42,7 +42,8 @@ MEM = 70
 MEM_V = 0
 MEM_A = 2
 MEM_WRK = 4
-MEM_CTL_LEN = 8
+MEM_USE = 8
+MEM_CTL_LEN = 9
 MEM_BLK_LEN = 512 + MEM_CTL_LEN
 
 def sym?(o)

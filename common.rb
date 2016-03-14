@@ -40,11 +40,19 @@ STORE_REQ = 68
 
 MEM = 70
 MEM_V = 0
-MEM_A = 2
-MEM_WRK = 4
-MEM_USE = 8
-MEM_CTL_LEN = 9
-MEM_BLK_LEN = 512 + MEM_CTL_LEN
+if $bfs24
+  MEM_A = 3
+  MEM_WRK = 6
+  MEM_USE = 12
+  MEM_CTL_LEN = 13
+  MEM_BLK_LEN = (256*3) + MEM_CTL_LEN
+else
+  MEM_A = 2
+  MEM_WRK = 4
+  MEM_USE = 8
+  MEM_CTL_LEN = 9
+  MEM_BLK_LEN = (256*2) + MEM_CTL_LEN
+end
 
 def sym?(o)
   o.class == Symbol

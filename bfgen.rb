@@ -81,12 +81,17 @@ class BFGen
     emit v > 0 ? '+' * v : '-' * -v
   end
 
-  def loop(ptr, &cb)
+  def loop(ptr, op=nil, &cb)
     move_ptr(ptr)
     emit '['
+    emit op if op
     cb[]
     move_ptr(ptr)
     emit ']'
+  end
+
+  def decloop(ptr, &cb)
+    loop(ptr, '-', &cb)
   end
 
   def not(from, to, wrk)

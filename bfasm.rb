@@ -282,8 +282,7 @@ class BFAsm
         end
       else
         if $bfs24
-          g.loop(WRK-1){
-            g.emit '-'
+          g.decloop(WRK-1){
             g.move_ptr(WRK+2)
             # If the RHS becomes zero at this moment, LHS >=
             # RHS. Modify the next byte.
@@ -297,8 +296,7 @@ class BFAsm
         end
 
         # Compare the higher byte first.
-        g.loop(WRK){
-          g.emit '-'
+        g.decloop(WRK){
           g.move_ptr(WRK+3)
           # If the RHS becomes zero at this moment, LHS >=
           # RHS. Modify the next byte.
@@ -314,8 +312,7 @@ class BFAsm
         g.move_ptr(WRK+3)
         g.ifzero(3, true) {
           # Compare the lower byte.
-          g.loop(WRK+1) {
-            g.emit '-'
+          g.decloop(WRK+1) {
             g.move_ptr(WRK+4)
             g.ifzero(1) do
               g.add(WRK, 1)
@@ -374,8 +371,7 @@ class BFAsm
       end
 
       # Add WRK to dest.
-      g.loop(WRK+1) {
-        g.emit '-'
+      g.decloop(WRK+1) {
         # Increment.
         g.move_ptr(dest+1)
         g.emit '+'
@@ -392,8 +388,7 @@ class BFAsm
       }
 
       if $bfs24
-        g.loop(WRK) {
-          g.emit '-'
+        g.decloop(WRK) {
           # Increment.
           g.move_ptr(dest)
           g.emit '+'
@@ -421,8 +416,7 @@ class BFAsm
       end
 
       # Subtract WRK from dest.
-      g.loop(WRK+1) {
-        g.emit '-'
+      g.decloop(WRK+1) {
         g.move_ptr(dest+1)
         # Carry?
         g.ifzero(1) {
@@ -439,8 +433,7 @@ class BFAsm
       }
 
       if $bfs24
-        g.loop(WRK) {
-          g.emit '-'
+        g.decloop(WRK) {
           g.move_ptr(dest)
           # Carry?
           g.ifzero(2) {

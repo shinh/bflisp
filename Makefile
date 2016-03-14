@@ -73,7 +73,7 @@ $(BFS_RBS_STAGED): out/%.bfs: test/%.bfs.rb
 	ruby $< > $@.tmp && mv $@.tmp $@
 
 $(BFS_CS_STAGED): out/%.bfs: test/%.c 8cc/8cc libf.h
-	8cc/8cc -S $< -o $@.tmp && mv $@.tmp $@
+	8cc/8cc -S -o $@.tmp $< && mv $@.tmp $@
 
 $(BFS_BFS): %.bf: %.bfs $(RUBY_DEPS)
 	./bfcore.rb $< > $@.tmp && mv $@.tmp $@
@@ -97,7 +97,7 @@ $(TEST_OKS): %.ok1: %.res %.sim
 	$(call run-diff,$*.res,$*.sim,gcc:8cc)
 
 $(LISP_BFS): lisp.c 8cc/8cc libf.h
-	8cc/8cc -S $< -o $@.tmp && mv $@.tmp $@
+	8cc/8cc -S -o $@.tmp $< && mv $@.tmp $@
 
 $(LISP_BF): $(LISP_BFS)
 	./bfcore.rb $< > $@.tmp && mv $@.tmp $@
@@ -106,7 +106,7 @@ $(8CC_C): 8cc/8cc merge_8cc.sh
 	./merge_8cc.sh > $@.tmp && mv $@.tmp $@
 
 $(8CC_BFS): out/8cc.c 8cc/8cc libf.h
-	8cc/8cc -S $< -o $@.tmp && mv $@.tmp $@
+	8cc/8cc -S -o $@.tmp $< && mv $@.tmp $@
 
 $(8CC_BF): $(8CC_BFS)
 	./bfcore.rb $< > $@.tmp && mv $@.tmp $@

@@ -8,4 +8,5 @@ int main() {
   printf("%s %d\n", buf, n);
   n = snprintf(buf, 3, "hogefuga");
   printf("%s %d\n", buf, n);
+  return 0;
 }

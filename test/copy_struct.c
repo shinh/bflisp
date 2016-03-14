@@ -17,4 +17,5 @@ int main() {
   S* s4 = malloc(sizeof(S));
   *s4 = s1;
   printf("%d %d %d\n", s4->x, s4->y, s4->z);
+  return 0;
 }

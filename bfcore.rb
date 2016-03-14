@@ -10,6 +10,24 @@ class BFCore
   def gen_prologue(data)
     g = @g
 
+    g.comment('interpreter check')
+
+    # Test for cell wrap != 256
+    g.emit '>[-]<[-]++++++++[>++++++++<-]>[<++++>-]<[>>'
+
+    # Print message 'Sorry this program needs an 8bit interpreter\n'
+    g.emit '>++++[<++++>-]<+[>++++++>+++++++>++>+++>+++++<<<<<-]>>>>>--.<<<-'
+    g.emit '-------.+++..+++++++.>--.<-----.<++.+.>-.>.<---.++.---.<--.>+++.'
+    g.emit '<------.>-----.>.<+.<++++..-.>+++++.>.<<---.>-----.>.>+++++.<<<+'
+    g.emit '.>-----.+++++++++++.>.<<+++++++.+++++.>.<---------.>--.--.++.<.>'
+    g.emit '++.<.>--.<<++++++++++.'
+
+    # endif
+    g.emit '<<[-]]'
+
+    # Test for cell wrap != 256 and flip condition
+    g.emit '>[-]<[-]++++++++[>++++++++<-]>[<++++>-]+<[>-<[-]]>[-<'
+
     g.comment('init data')
     data.each do |d, i|
       raise if i > 65535
@@ -143,6 +161,11 @@ class BFCore
     g.comment('epilogue')
     g.move_ptr(RUNNING)
     g.emit ']'
+
+    # endif for cell size check. (should be [-]] but we already have a zero)
+    g.emit ']'
+    # EOL at EOF
+    g.comment('[...THE END...]')
   end
 
 end

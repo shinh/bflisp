@@ -37,85 +37,74 @@ class BFCore
     g = @g
     g.comment 'memory (load)'
 
-    g.move_ptr(LOAD_REQ)
-    g.emit '[-'
-    g.move_ptr(MEM)
-    g.set_ptr(0)
+    g.decloop(LOAD_REQ) {
+      g.move_ptr(MEM)
+      g.set_ptr(0)
 
-    g.move_ptr(MEM_A)
-    g.emit '['
-    g.move_word(MEM_A, MEM_A + MEM_BLK_LEN)
-    g.move_ptr(MEM_A + MEM_BLK_LEN)
-    g.set_ptr(MEM_A)
-    g.add(MEM_WRK, 1)
-    g.move_ptr(MEM_A)
-    g.emit '-]'
+      g.decloop(MEM_A) {
+        g.move_word(MEM_A, MEM_A + MEM_BLK_LEN)
+        g.move_ptr(MEM_A + MEM_BLK_LEN)
+        g.set_ptr(MEM_A)
+        g.add(MEM_WRK, 1)
+      }
 
-    g.add(MEM_WRK, -1)
-    256.times{|al|
-      g.move_ptr(MEM_A + 1)
-      g.ifzero(1) do
-        g.copy_word(MEM_CTL_LEN + al * 2, MEM_V, MEM_WRK + 2)
-      end
-      g.add(MEM_A + 1, -1)
+      g.add(MEM_WRK, -1)
+      256.times{|al|
+        g.move_ptr(MEM_A + 1)
+        g.ifzero(1) do
+          g.copy_word(MEM_CTL_LEN + al * 2, MEM_V, MEM_WRK + 2)
+        end
+        g.add(MEM_A + 1, -1)
+      }
+      g.clear(MEM_A + 1)
+      g.add(MEM_WRK, 1)
+      g.decloop(MEM_WRK) {
+        g.move_word(MEM_V, MEM_V - MEM_BLK_LEN)
+        g.move_ptr(MEM_V - MEM_BLK_LEN)
+        g.set_ptr(MEM_V)
+      }
+
+      g.move_ptr(0)
+      g.set_ptr(MEM)
+      g.clear_word(A)
+      g.move_word(MEM + MEM_V, A)
     }
-    g.clear(MEM_A + 1)
-    g.add(MEM_WRK, 1)
-    g.move_ptr(MEM_WRK)
-    g.emit '[-'
-    g.move_word(MEM_V, MEM_V - MEM_BLK_LEN)
-    g.move_ptr(MEM_V - MEM_BLK_LEN)
-    g.set_ptr(MEM_V)
-    g.move_ptr(MEM_WRK)
-    g.emit ']'
-
-    g.move_ptr(0)
-    g.set_ptr(MEM)
-    g.clear_word(A)
-    g.move_word(MEM + MEM_V, A)
-    g.move_ptr(LOAD_REQ)
-
-    g.emit ']'
   end
 
   def gen_mem_store
     g = @g
     g.comment 'memory (store)'
 
-    g.move_ptr(STORE_REQ)
-    g.emit '[-'
-    g.move_ptr(MEM)
-    g.set_ptr(0)
+    g.decloop(STORE_REQ) {
+      g.move_ptr(MEM)
+      g.set_ptr(0)
 
-    g.move_ptr(MEM_A)
-    g.emit '['
-    g.move_word(MEM_V, MEM_V + MEM_BLK_LEN)
-    g.move_word(MEM_A, MEM_A + MEM_BLK_LEN)
-    g.move_ptr(MEM_A + MEM_BLK_LEN)
-    g.set_ptr(MEM_A)
-    g.add(MEM_WRK, 1)
-    g.move_ptr(MEM_A)
-    g.emit '-]'
+      g.decloop(MEM_A) {
+        g.move_word(MEM_V, MEM_V + MEM_BLK_LEN)
+        g.move_word(MEM_A, MEM_A + MEM_BLK_LEN)
+        g.move_ptr(MEM_A + MEM_BLK_LEN)
+        g.set_ptr(MEM_A)
+        g.add(MEM_WRK, 1)
+      }
 
-    # VH VL 0 AL 1
-    g.add(MEM_WRK, -1)
-    256.times{|al|
-      g.move_ptr(MEM_A + 1)
-      g.ifzero(1) do
-        g.clear_word(MEM_CTL_LEN + al * 2)
-        g.move_word(MEM_V, MEM_CTL_LEN + al * 2)
-      end
-      g.add(MEM_A + 1, -1)
+      # VH VL 0 AL 1
+      g.add(MEM_WRK, -1)
+      256.times{|al|
+        g.move_ptr(MEM_A + 1)
+        g.ifzero(1) do
+          g.clear_word(MEM_CTL_LEN + al * 2)
+          g.move_word(MEM_V, MEM_CTL_LEN + al * 2)
+        end
+        g.add(MEM_A + 1, -1)
+      }
+      g.clear(MEM_A + 1)
+      g.add(MEM_WRK, 1)
+      g.move_ptr(MEM_WRK)
+      g.emit '[-' + '<' * MEM_BLK_LEN + ']'
+
+      g.move_ptr(0)
+      g.set_ptr(MEM)
     }
-    g.clear(MEM_A + 1)
-    g.add(MEM_WRK, 1)
-    g.move_ptr(MEM_WRK)
-    g.emit '[-' + '<' * MEM_BLK_LEN + ']'
-
-    g.move_ptr(0)
-    g.set_ptr(MEM)
-    g.move_ptr(STORE_REQ)
-    g.emit ']'
   end
 
   def gen_epilogue

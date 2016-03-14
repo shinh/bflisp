@@ -21,7 +21,8 @@ int getchar(void);
 int putchar(int c);
 int puts(const char* p);
 // We need to declare malloc as int* to reduce bitcasts */
-int* calloc(int n, int s);
+void* malloc(size_t s);
+void* calloc(int n, int s);
 void free(void* p);
 void exit(int s);
 

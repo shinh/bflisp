@@ -1,5 +1,3 @@
-#include <stddef.h>
-
 #include "libf.h"
 
 int g_buf = -1;

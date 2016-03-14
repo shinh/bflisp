@@ -12,9 +12,10 @@ class BFCore
 
     g.comment('init data')
     data.each do |d, i|
+      raise if i > 65535
       hi = i / 256
       lo = i % 256
-      ptr = MEM + MEM_BLK_LEN * hi + MEM_CTL_LEN + lo * 2
+      ptr = MEM + MEM_BLK_LEN * hi + MEM_CTL_LEN + lo * (BITS / 8)
       g.add_word(ptr, d)
     end
 
@@ -60,7 +61,7 @@ class BFCore
       256.times{|al|
         g.move_ptr(MEM_A + 1)
         g.ifzero(1) do
-          g.copy_word(MEM_CTL_LEN + al * 2, MEM_V, MEM_WRK + 2)
+          g.copy_word(MEM_CTL_LEN + al * (BITS / 8), MEM_V, MEM_WRK + 2)
         end
         g.add(MEM_A + 1, -1)
       }
@@ -117,8 +118,8 @@ class BFCore
       256.times{|al|
         g.move_ptr(MEM_A + 1)
         g.ifzero(1) do
-          g.clear_word(MEM_CTL_LEN + al * 2)
-          g.move_word(MEM_V, MEM_CTL_LEN + al * 2)
+          g.clear_word(MEM_CTL_LEN + al * (BITS / 8))
+          g.move_word(MEM_V, MEM_CTL_LEN + al * (BITS / 8))
         end
         g.add(MEM_A + 1, -1)
       }

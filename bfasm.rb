@@ -466,7 +466,8 @@ class BFAsm
       g.emit '[[-]'
       g.clear_word(NPC)
       if sym?(args[0])
-        g.copy_word(regpos(args[0]), NPC, WRK)
+        r = regpos(args[0])
+        g.copy_word(r, NPC, WRK)
       else
         g.add_word(NPC, args[0])
       end

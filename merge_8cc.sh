@@ -4,8 +4,7 @@ set -e
 
 mkdir -p tmp8cc
 
-rm -f all8cc.c
-echo '#include "../libf.h"'
+cat libf.h
 
 for c in 8cc/*.h 8cc/*.c; do
     grep -v '#include <' $c > tmp$c

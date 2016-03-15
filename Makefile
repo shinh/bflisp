@@ -44,6 +44,8 @@ LISP_BF := out/lisp.bf
 8CC_C := out/8cc.c
 8CC_BFS := out/8cc.bfs
 8CC_BF := out/8cc.bf
+8CC_BF_C := out/8cc.bf.c
+8CC_BF_EXE := out/8cc.bf.exe
 
 ALL := $(BFS_BFS) $(BFS_SIMS) $(BFS_OKS_RUN)
 ALL += $(BFS_OBJS) $(BFS_ASMS)
@@ -110,6 +112,12 @@ $(8CC_BFS): out/8cc.c 8cc/8cc libf.h
 
 $(8CC_BF): $(8CC_BFS)
 	./bfcore.rb $< > $@.tmp && mv $@.tmp $@
+
+$(8CC_BF_C): $(8CC_BF) out/bfopt
+	out/bfopt -c $< $@.tmp && mv $@.tmp $@
+
+$(8CC_BF_EXE): $(8CC_BF_C)
+	$(CC) $< -o $@
 
 out/bfopt: bfopt.cc
 	$(CXX) $(CXXFLAGS) $< -o $@

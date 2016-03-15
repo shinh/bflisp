@@ -320,16 +320,19 @@ class BFAsm
             g.move_ptr(WRK+2)
             # If the RHS becomes zero at this moment, LHS >=
             # RHS. Modify the next byte.
-            g.ifzero(4) do
-              g.clear(WRK+3)
-              g.add(WRK+2, 1)
+            g.ifzero(5) do
               g.clear(WRK-1)
+              g.clear(WRK)
+              g.clear(WRK+1)
+              g.clear(WRK+3)
+              g.clear(WRK+4)
+              g.add(WRK+2, 1)
             end
             g.add(WRK+2, -1)
           }
 
           g.move_ptr(WRK+2)
-          g.ifzero(4, true) {
+          g.ifzero(4, true, '<<[-]>>') {
             ge_rest[]
           }
         else
@@ -337,7 +340,6 @@ class BFAsm
         end
 
         g.clear(WRK+1)
-        g.clear(WRK+2)
         g.clear_word(WRK+3)
         g.clear_word(WRK+6)
 

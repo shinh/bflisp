@@ -126,7 +126,7 @@ class BFGen
     @mp = omp
   end
 
-  def ifzero(off, reset=false, &cb)
+  def ifzero(off, reset=false, ifnz='', &cb)
     omp = @mp
     @mp = 0
 
@@ -136,6 +136,7 @@ class BFGen
     if reset
       emit '[-]'
     end
+    emit ifnz
     move_ptr(off)
     emit ']'
     move_ptr(off * 2)
@@ -165,6 +166,10 @@ class BFGen
 
   def dbg(msg, ptr)
     return if !$verbose
+    info(msg, ptr)
+  end
+
+  def info(msg, ptr)
     clear(ptr)
     prev = 0
     msg.each_byte{|b|

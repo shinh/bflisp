@@ -20,6 +20,7 @@ typedef char* va_list;
 int getchar(void);
 int putchar(int c);
 int puts(const char* p);
+int printf(const char* fmt, ...);
 // We need to declare malloc as int* to reduce bitcasts */
 void* malloc(size_t s);
 void* calloc(int n, int s);

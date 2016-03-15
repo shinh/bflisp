@@ -281,53 +281,63 @@ class BFAsm
           }
         end
       else
+        ge_rest = proc {
+          # Compare the higher byte first.
+          g.decloop(WRK){
+            g.move_ptr(WRK+3)
+            # If the RHS becomes zero at this moment, LHS >=
+            # RHS. Modify the next byte.
+            g.ifzero(3) do
+              g.clear(WRK+4)
+              g.add(WRK+3, 1)
+              g.clear(WRK)
+            end
+            g.add(WRK+3, -1)
+          }
+
+          # LH=0. If RH is also zero compare the lower byte.
+          g.move_ptr(WRK+3)
+          g.ifzero(3, true) {
+            # Compare the lower byte.
+            g.decloop(WRK+1) {
+              g.move_ptr(WRK+4)
+              g.ifzero(1) do
+                g.add(WRK, 1)
+              end
+              g.add(WRK+4, -1)
+            }
+
+            # LL=0. Check RL again.
+            g.move_ptr(WRK+4)
+            g.ifzero(1, true) do
+              g.add(WRK, 1)
+            end
+          }
+        }
+
         if $bfs24
           g.decloop(WRK-1){
             g.move_ptr(WRK+2)
             # If the RHS becomes zero at this moment, LHS >=
             # RHS. Modify the next byte.
-            g.ifzero(3) do
+            g.ifzero(4) do
               g.clear(WRK+3)
               g.add(WRK+2, 1)
               g.clear(WRK-1)
             end
             g.add(WRK+2, -1)
           }
+
+          g.move_ptr(WRK+2)
+          g.ifzero(4, true) {
+            ge_rest[]
+          }
+        else
+          ge_rest[]
         end
 
-        # Compare the higher byte first.
-        g.decloop(WRK){
-          g.move_ptr(WRK+3)
-          # If the RHS becomes zero at this moment, LHS >=
-          # RHS. Modify the next byte.
-          g.ifzero(3) do
-            g.clear(WRK+4)
-            g.add(WRK+3, 1)
-            g.clear(WRK)
-          end
-          g.add(WRK+3, -1)
-        }
-
-        # LH=0. If RH is also zero compare the lower byte.
-        g.move_ptr(WRK+3)
-        g.ifzero(3, true) {
-          # Compare the lower byte.
-          g.decloop(WRK+1) {
-            g.move_ptr(WRK+4)
-            g.ifzero(1) do
-              g.add(WRK, 1)
-            end
-            g.add(WRK+4, -1)
-          }
-
-          # LL=0. Check RL again.
-          g.move_ptr(WRK+4)
-          g.ifzero(1, true) do
-            g.add(WRK, 1)
-          end
-        }
-
         g.clear(WRK+1)
+        g.clear(WRK+2)
         g.clear_word(WRK+3)
         g.clear_word(WRK+6)
 

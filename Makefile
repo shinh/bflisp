@@ -15,6 +15,9 @@ BFS_RBS_STAGED := $(BFS_RBS:test/%.bfs.rb=out/%.bfs)
 BFS_SRCS += $(BFS_RBS_STAGED)
 
 BFS_CS := $(wildcard test/*.c)
+ifndef BFS24
+BFS_CS := $(filter-out test/24_%.c, $(BFS_CS))
+endif
 
 BFS_CS_STAGED := $(BFS_CS:test/%.c=out/%.bfs)
 TEST_EXES := $(BFS_CS:test/%.c=out/%.exe)

@@ -271,7 +271,7 @@ void run(const vector<Op*>& ops) {
 void compile(const vector<Op*>& ops, const char* fname) {
   FILE* fp = fopen(fname, "wb");
   fprintf(fp, "#include <stdio.h>\n");
-  fprintf(fp, "unsigned char mem[4096*4096];\n");
+  fprintf(fp, "unsigned char mem[4096*4096*10];\n");
   fprintf(fp, "int main() {\n");
   fprintf(fp, "unsigned char* mp = mem;\n");
 

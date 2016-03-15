@@ -374,7 +374,8 @@ int main(int argc, char* argv[]) {
     int c = fgetc(fp);
     if (c == EOF)
       break;
-    buf += c;
+    if (strchr("+-<>.,[]@", c))
+      buf += c;
   }
   fclose(fp);
 

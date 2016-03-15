@@ -121,19 +121,12 @@ static void print_str(const char* p) {
 }
 
 static char* stringify_int(long v, char* p) {
-  int is_negative = 0;
   *p = '\0';
-  if (v < 0) {
-    v = -v;
-    is_negative = 1;
-  }
   do {
     --p;
     *p = v % 10 + '0';
     v /= 10;
   } while (v);
-  if (is_negative)
-    *--p = '-';
   return p;
 }
 

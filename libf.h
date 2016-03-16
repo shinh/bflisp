@@ -561,11 +561,29 @@ unsigned long long strtoull(const char *nptr, char **endptr, int base) {
 #endif
 
 static int __builtin_mul(int a, int b) {
-  int r = 0;
-  while (a--) {
-    r += b;
+  int i, e, v;
+  int d[24];
+  int r[24];
+  for (i = 0, e = 1, v = a; e <= b; i++) {
+    d[i] = v;
+    r[i] = e;
+    v += v;
+    int ne = e + e;
+    if (ne < e)
+      break;
+    e = ne;
   }
-  return r;
+
+  int a = 0;
+  for (;; i--) {
+    if (b >= r[i]) {
+      a += d[i];
+      b -= r[i];
+    }
+    if (i == 0)
+      break;
+  }
+  return a;
 }
 
 static unsigned int __builtin_div(unsigned int a, unsigned int b) {

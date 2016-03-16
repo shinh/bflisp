@@ -16,7 +16,7 @@ How?
 
 Here's an overall picture:
 
-![Overall picture](https://github.com/shinh/bflisp/blob/master/diagram.svg)
+![Overall picture](https://cdn.rawgit.com/shinh/bflisp/master/diagram.svg)
 
 The modified 8cc (a small but full featured C compiler) outputs
 assembly code for a virtual 16bit/24bit Harvard architecture CPU I

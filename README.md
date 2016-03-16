@@ -1,5 +1,96 @@
+The original goal of this project was to run a Lisp interpreter on
+Brainfuck. The goal was extended and this project also has a C
+compiler which runs on Brainfuck. The Lisp interpreter and the C
+compiler are generated from C code by
+[modified 8cc](https://github.com/shinh/8cc/tree/bfs). This means we
+have a toolchain which can translate a subset of C to Brainfuck code.
+
+A C compiler in Brainfuck
+=========================
+
+[8cc.bf](https://github.com/shinh/bflisp/blob/master/8cc.bf)
+is the C compiler in Brainfuck.
+
+How?
+----
+
+Here's an overall picture:
+
+![Overall picture](https://github.com/shinh/bflisp/blob/master/diagram.svg)
+
+The modified 8cc (a small but full featured C compiler) outputs
+assembly code for a virtual 16bit/24bit Harvard architecture CPU I
+defined. The CPU has only a handful instructions - mov, add, sub,
+load, store, comparison, conditional jumps, putc, getc, and exit. See
+the top comment in
+[bfasm.rb](https://github.com/shinh/bflisp/blob/master/bfasm.rb)
+or [test/*.bfs](https://github.com/shinh/bflisp/tree/master/test)
+for the detail.
+
+Then, [bfcore.rb](https://github.com/shinh/bflisp/blob/master/bfcore.rb)
+translates the assembly code to Brainfuck code. The
+CPU has seven 16bit/24bit registers and they are consist of two memory cells
+in 8bit Brainfuck (btw, I believe 8bit Brainfuck is the best choice for
+this project). For each cycle, a big (~10k-way for bflisp.bf) switch
+statement in Brainfuck is executed and each case statement represents
+the virtual CPU instruction.
+
+Memory operations are done by a loop which finds a corresponding row
+using the higher bits and a 256-way switch statement for the lower
+8bits. The memory module consumes ~1MB (~12MB for 24bit mode)
+Brainfuck code space.
+
+As the resulted Brainfuck code is big, bfopt.cc was developed. This
+implementation merges consecutive +- and <>. This also optimizes
+simple loops with balanced <>.
+
+To make debugging easier, there's a simulator for the virtual CPU
+(bfsim.rb). Lisp on the virtual CPU simulator is much faster than
+Lisp on the virtual CPU implemented in Brainfuck. You can use
+"./bfsim.rb bflisp.bfs" instead of "opt/bfopt bflisp.bf" for faster
+execution.
+
+    echo '(+ 3 4)' | ./bfsim.rb bflisp.bfs
+    > 7
+
+The BF-targeted 8cc
+-------------------
+
+For simplicity, the BF-targeted 8cc is different from the original
+8cc:
+
+* It lacks bit operations.
+* It lacks floating point numbers.
+* All types are unsigned.
+* sizeof(char)==sizeof(int)==sizeof(void*)==sizeof(long long)==1.
+* One "byte" has 24 bits.
+* Cannot handle #include.
+* It reads C code from the standard input.
+
+With all the restriction above, however, 8cc.bf can compile 8cc.c
+itself. In other words, 8cc.bf is a self-hosted implementation. You
+can confirm this by (note you need TCC installed): 
+
+    $ time make out/8cc.3.bf  # Takes ~10 hours
+    ./merge_8cc.sh > out/8cc.c.tmp && mv out/8cc.c.tmp out/8cc.c
+    8cc/8cc -S -o out/8cc.bfs.tmp out/8cc.c && mv out/8cc.bfs.tmp out/8cc.bfs
+    BFS24=1 ./bfcore.rb out/8cc.bfs > out/8cc.bf.tmp && mv out/8cc.bf.tmp out/8cc.bf
+    out/bfopt -c out/8cc.bf out/8cc.bf.c.tmp && mv out/8cc.bf.c.tmp out/8cc.bf.c
+    tcc -c out/8cc.bf.c -o out/8cc.bf.tcc.o
+    cc out/8cc.bf.tcc.o -o out/8cc.bf.tcc.exe
+    out/8cc.bf.tcc.exe < out/8cc.c > out/8cc.2.bfs.tmp && mv out/8cc.2.bfs.tmp out/8cc.2.bfs
+    BFS24=1 ./bfcore.rb out/8cc.2.bfs > out/8cc.2.bf.tmp && mv out/8cc.2.bf.tmp out/8cc.2.bf
+    out/bfopt -c out/8cc.2.bf out/8cc.2.bf.c.tmp && mv out/8cc.2.bf.c.tmp out/8cc.2.bf.c
+    tcc -c out/8cc.2.bf.c -o out/8cc.2.bf.tcc.o
+    cc out/8cc.2.bf.tcc.o -o out/8cc.2.bf.tcc.exe
+    out/8cc.2.bf.tcc.exe < out/8cc.c > out/8cc.3.bfs.tmp && mv out/8cc.3.bfs.tmp out/8cc.3.bfs
+    BFS24=1 ./bfcore.rb out/8cc.3.bfs > out/8cc.3.bf.tmp && mv out/8cc.3.bf.tmp out/8cc.3.bf
+    make out/8cc.3.bf  36979.51s user 1.38s system 99% cpu 10:16:50.68 total
+    $ cmp out/8cc.2.bf out/8cc.3.bf
+
+
 BfLisp
-=======
+======
 
 Lisp implementation in Brainfuck
 
@@ -73,44 +164,6 @@ Special Forms
 - define
 
 
-How?
-----
-
-The modified 8cc (a small but full featured C compiler) outputs
-assembly code for a virtual 16bit Harvard architecture CPU I
-defined. The CPU has only a handful instructions - mov, add, sub,
-load, store, comparison, conditional jumps, putc, getc, and exit. See
-the top comment in
-[bfasm.rb](https://github.com/shinh/bflisp/blob/master/bfasm.rb)
-or [test/*.bfs](https://github.com/shinh/bflisp/tree/master/test)
-for the detail.
-
-Then, [bfcore.rb](https://github.com/shinh/bflisp/blob/master/bfcore.rb)
-translates the assembly code to Brainfuck code. The
-CPU has seven 16bit registers and they are consist of two memory cells
-in 8bit Brainfuck (btw, I believe 8bit Brainfuck is the best choice for
-this project). For each cycle, a big (~10k-way for bflisp.bf) switch
-statement in Brainfuck is executed and each case statement represents
-the virtual CPU instruction.
-
-Memory operations are done by a loop which finds a corresponding row
-using the higher 8bits and a 256-way switch statement for the lower
-8bits. The memory module consumes ~1MB Brainfuck code space.
-
-As the resulted Brainfuck code is big, bfopt.cc was developed. This
-implementation merges consecutive +- and <>. This also optimizes
-simple loops with balanced <>.
-
-To make debugging easier, there's a simulator for the virtual CPU
-(bfsim.rb). Lisp on the virtual CPU simulator is much faster than
-Lisp on the virtual CPU implemented in Brainfuck. You can use
-"./bfsim.rb bflisp.bfs" instead of "opt/bfopt bflisp.bf" for faster
-execution.
-
-    echo '(+ 3 4)' | ./bfsim.rb bflisp.bfs
-    > 7
-
-
 More Complicated Examples
 -------------------------
 
@@ -151,9 +204,8 @@ run bflisp.bf with little modification (see bff4.patch).
 TODO
 ----
 
-* Run 8cc on Brainfuck.
+* Re-implement bfcore.rb in C so assemble can be done by BF itself.
 * Implement the virtual CPU with other esoteric language.
-* Fix bugs.
 
 
 See also

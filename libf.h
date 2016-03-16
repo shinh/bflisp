@@ -564,26 +564,26 @@ static int __builtin_mul(int a, int b) {
   int i, e, v;
   int d[24];
   int r[24];
-  for (i = 0, e = 1, v = a; e <= b; i++) {
+  for (i = 0, e = 1, v = a;; i++) {
     d[i] = v;
     r[i] = e;
     v += v;
     int ne = e + e;
-    if (ne < e)
+    if (ne < e || ne > b)
       break;
     e = ne;
   }
 
-  int a = 0;
+  int x = 0;
   for (;; i--) {
     if (b >= r[i]) {
-      a += d[i];
+      x += d[i];
       b -= r[i];
     }
     if (i == 0)
       break;
   }
-  return a;
+  return x;
 }
 
 static unsigned int __builtin_div(unsigned int a, unsigned int b) {

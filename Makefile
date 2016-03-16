@@ -46,10 +46,6 @@ LISP_BF := out/lisp.bf
 
 8CC_C := out/8cc.c
 8CC_BFS := out/8cc.bfs
-8CC_BF := out/8cc.bf
-8CC_BF_C := out/8cc.bf.c
-8CC_BF_TCC_O := out/8cc.bf.tcc.o
-8CC_BF_TCC_EXE := out/8cc.bf.tcc.exe
 
 ALL := $(BFS_BFS) $(BFS_SIMS) $(BFS_OKS_RUN)
 ALL += $(BFS_OBJS) $(BFS_ASMS)
@@ -114,17 +110,23 @@ $(8CC_C): 8cc/8cc merge_8cc.sh
 $(8CC_BFS): out/8cc.c 8cc/8cc libf.h
 	8cc/8cc -S -o $@.tmp $< && mv $@.tmp $@
 
-$(8CC_BF): $(8CC_BFS)
-	./bfcore.rb $< > $@.tmp && mv $@.tmp $@
+out/8cc.bf out/8cc.2.bf out/8cc.3.bf: out/8cc%.bf: out/8cc%.bfs
+	BFS24=1 ./bfcore.rb $< > $@.tmp && mv $@.tmp $@
 
-$(8CC_BF_C): $(8CC_BF) out/bfopt
+out/8cc.bf.c out/8cc.2.bf.c: out/8cc%.bf.c: out/8cc%.bf out/bfopt
 	out/bfopt -c $< $@.tmp && mv $@.tmp $@
 
-$(8CC_BF_TCC_O): $(8CC_BF_C)
+out/8cc.bf.tcc.o out/8cc.2.bf.tcc.o: out/8cc%.bf.tcc.o: out/8cc%.bf.c
 	tcc -c $< -o $@
 
-$(8CC_BF_TCC_EXE): $(8CC_BF_TCC_O)
+out/8cc.bf.tcc.exe out/8cc.2.bf.tcc.exe: out/8cc%.bf.tcc.exe: out/8cc%.bf.tcc.o
 	$(CC) $< -o $@
+
+out/8cc.2.bfs: out/8cc.bf.tcc.exe $(8CC_C)
+	$< < out/8cc.c > $@.tmp && mv $@.tmp $@
+
+out/8cc.3.bfs: out/8cc.2.bf.tcc.exe $(8CC_C)
+	$< < out/8cc.c > $@.tmp && mv $@.tmp $@
 
 out/bfopt: bfopt.cc
 	$(CXX) $(CXXFLAGS) $< -o $@

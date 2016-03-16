@@ -1,0 +1,39 @@
+digraph diagram {
+"8cc.c" [shape = doublecircle];
+"lisp.c" [shape = doublecircle];
+"gcc (host=target=x64)" [shape = rect];
+
+"m0" [shape=diamond,style=filled,label="",height=.1,width=.1];
+"8cc.c" -> "m0" [dir=none];
+"m0" -> "8cc (host=x64 target=bfs)";
+"gcc (host=target=x64)" -> "m0" [dir=none];
+
+"m1" [shape=diamond,style=filled,label="",height=.1,width=.1];
+"8cc.c" -> "m1" [dir=none];
+"m1" -> "8cc.bfs";
+"8cc (host=x64 target=bfs)" -> "m1" [dir=none];
+
+"8cc.bfs" -> "8cc.bf" [label = "bfcore.rb"];
+
+"m2" [shape=diamond,style=filled,label="",height=.1,width=.1];
+"8cc.c" -> "m2" [dir=none];
+"m2" -> "8cc.2.bfs";
+"8cc.bf" -> "m2" [dir=none]
+
+"8cc.2.bfs" -> "8cc.2.bf" [label = "bfcore.rb"];
+
+"m3" [shape=diamond,style=filled,label="",height=.1,width=.1];
+"8cc.c" -> "m3" [dir=none];
+"m3" -> "8cc.3.bfs";
+"8cc.2.bf" -> "m3" [dir=none];
+
+"8cc.3.bfs" -> "8cc.3.bf" [label = "bfcore.rb"];
+"8cc.2.bf" -> "8cc.3.bf" [label = "identical!" dir=both];
+
+"m4" [shape=diamond,style=filled,label="",height=.1,width=.1];
+"lisp.c" -> "m4" [dir=none];
+"m4" -> "lisp.bfs";
+"8cc (host=x64 target=bfs)" -> "m4" [dir=none];
+"lisp.bfs" -> "lisp.bf" [label = "bfcore.rb"];
+
+}

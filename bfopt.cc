@@ -345,7 +345,7 @@ void compile(const vector<Op*>& ops, const char* fname) {
 int main(int argc, char* argv[]) {
   bool should_compile = false;
   const char* arg0 = argv[0];
-  while (argv[1][0] == '-') {
+  while (argc >= 2 && argv[1][0] == '-') {
     if (!strcmp(argv[1], "-c")) {
       should_compile = true;
     } else if (!strcmp(argv[1], "-v")) {

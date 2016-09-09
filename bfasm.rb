@@ -142,10 +142,11 @@ class BFAsm
         if line =~ /^\.long (-?\d+)/
           add_data($1.to_i & UINT_MAX)
         elsif line =~ /^\.long (\.?\w+)/
-          if !@labels[$1]
-            raise 'TODO'
+          if @labels[$1]
+            add_data(@labels[$1])
+          else
+            add_data($1)
           end
-          add_data(@labels[$1])
         elsif line =~ /^\.lcomm (\w+), (\d+)/
           name = $1
           size = $2.to_i
@@ -211,6 +212,17 @@ class BFAsm
     end
 
     @data[0][0] = cur_data_addr
+
+    @data.size.times{|i|
+      n = @data[i][0]
+      if n.class == String
+        v = @labels[n]
+        if !v
+          raise "undefined label #{n}"
+        end
+        @data[i][0] = v
+      end
+    }
 
     @code = @code.each_with_index.map{|opa, i|
       opa.map do |op, *args, lineno|

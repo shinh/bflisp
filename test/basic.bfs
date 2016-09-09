@@ -1,17 +1,17 @@
-mov a, 33
-putc a  # !
+mov A, 33
+putc A  # !
 
-mov b, a
-putc b  # !
+mov B, A
+putc B  # !
 
-add b, a
-add b, -2
-putc b  # @
+add B, A
+add B, -2
+putc B  # @
 
 putc 88
 
-add a, -23
+add A, -23
 dump
-putc a  # \n
+putc A  # \n
 
 exit

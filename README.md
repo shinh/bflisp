@@ -1,3 +1,9 @@
+Note: you'd be more interested in
+[ELVM](https://github.com/shinh/elvm), the successor of this
+project. In addition to Lisp on Brainfuck, ELVM can compile
+C code into more esoteric languages such as Unlambda,
+INTERCAL, Befunge, Piet, Vim script, TeX, C++'s constexpr, etc.
+
 The original goal of this project was to run a Lisp interpreter on
 Brainfuck. The goal was extended and this project also has a C
 compiler which runs on Brainfuck. The Lisp interpreter and the C
